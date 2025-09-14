@@ -1,0 +1,432 @@
+Traceback (most recent call last):
+  File "/Users/oscar/software/miniconda3/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/Users/oscar/software/miniconda3/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/__main__.py", line 4, in <module>
+    uvicorn.main()
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/click/core.py", line 1157, in __call__
+    return self.main(*args, **kwargs)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/click/core.py", line 1078, in main
+    rv = self.invoke(ctx)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/click/core.py", line 1434, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/click/core.py", line 783, in invoke
+    return __callback(*args, **kwargs)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/main.py", line 413, in main
+    run(
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/main.py", line 580, in run
+    server.run()
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/server.py", line 67, in run
+    return asyncio.run(self.serve(sockets=sockets))
+  File "/Users/oscar/software/miniconda3/lib/python3.10/asyncio/runners.py", line 44, in run
+    return loop.run_until_complete(main)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/asyncio/base_events.py", line 649, in run_until_complete
+    return future.result()
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/server.py", line 71, in serve
+    await self._serve(sockets)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/server.py", line 78, in _serve
+    config.load()
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/config.py", line 436, in load
+    self.loaded_app = import_from_string(self.app)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/importer.py", line 22, in import_from_string
+    raise exc from None
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1050, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1027, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1006, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 688, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 883, in exec_module
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "/Users/oscar/projects/CrawlPro/backend/app/main.py", line 3, in <module>
+    from app.core.lifespan import lifespan
+  File "/Users/oscar/projects/CrawlPro/backend/app/core/lifespan.py", line 6, in <module>
+    from app.db.session import SessionLocal, engine
+  File "/Users/oscar/projects/CrawlPro/backend/app/db/session.py", line 4, in <module>
+    from app.core.config import settings
+  File "/Users/oscar/projects/CrawlPro/backend/app/core/config.py", line 6, in <module>
+    from pydantic_settings import BaseSettings
+ModuleNotFoundError: No module named 'pydantic_settings'
+INFO:     Will watch for changes in these directories: ['/Users/oscar/projects/CrawlPro/backend']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [6079] using StatReload
+Process SpawnProcess-1:
+Traceback (most recent call last):
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/networks.py", line 946, in import_email_validator
+    import email_validator
+ModuleNotFoundError: No module named 'email_validator'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/oscar/software/miniconda3/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/Users/oscar/software/miniconda3/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/_subprocess.py", line 80, in subprocess_started
+    target(sockets=sockets)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/server.py", line 67, in run
+    return asyncio.run(self.serve(sockets=sockets))
+  File "/Users/oscar/software/miniconda3/lib/python3.10/asyncio/runners.py", line 44, in run
+    return loop.run_until_complete(main)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/asyncio/base_events.py", line 649, in run_until_complete
+    return future.result()
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/server.py", line 71, in serve
+    await self._serve(sockets)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/server.py", line 78, in _serve
+    config.load()
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/config.py", line 436, in load
+    self.loaded_app = import_from_string(self.app)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1050, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1027, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1006, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 688, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 883, in exec_module
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "/Users/oscar/projects/CrawlPro/backend/app/main.py", line 3, in <module>
+    from app.core.lifespan import lifespan
+  File "/Users/oscar/projects/CrawlPro/backend/app/core/lifespan.py", line 7, in <module>
+    from app.services.scheduler import scheduler_service
+  File "/Users/oscar/projects/CrawlPro/backend/app/services/scheduler.py", line 13, in <module>
+    from app import crud
+  File "/Users/oscar/projects/CrawlPro/backend/app/crud/__init__.py", line 1, in <module>
+    from .crud_node import node
+  File "/Users/oscar/projects/CrawlPro/backend/app/crud/crud_node.py", line 8, in <module>
+    from app.schemas.node import NodeCreate, NodeUpdate
+  File "/Users/oscar/projects/CrawlPro/backend/app/schemas/__init__.py", line 2, in <module>
+    from .user import UserBase, UserCreate, UserUpdate, UserUpdateMe, UserUpdatePassword, UserOut
+  File "/Users/oscar/projects/CrawlPro/backend/app/schemas/user.py", line 7, in <module>
+    class UserBase(BaseModel):
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/_internal/_model_construction.py", line 237, in __new__
+    complete_model_class(
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/_internal/_model_construction.py", line 597, in complete_model_class
+    schema = gen_schema.generate_schema(cls)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/_internal/_generate_schema.py", line 711, in generate_schema
+    schema = self._generate_schema_inner(obj)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/_internal/_generate_schema.py", line 1004, in _generate_schema_inner
+    return self._model_schema(obj)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/_internal/_generate_schema.py", line 837, in _model_schema
+    {k: self._generate_md_field_schema(k, v, decorators) for k, v in fields.items()},
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/_internal/_generate_schema.py", line 837, in <dictcomp>
+    {k: self._generate_md_field_schema(k, v, decorators) for k, v in fields.items()},
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/_internal/_generate_schema.py", line 1206, in _generate_md_field_schema
+    common_field = self._common_field_schema(name, field_info, decorators)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/_internal/_generate_schema.py", line 1372, in _common_field_schema
+    schema = self._apply_annotations(
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/_internal/_generate_schema.py", line 2297, in _apply_annotations
+    schema = get_inner_schema(source_type)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/_internal/_schema_generation_shared.py", line 83, in __call__
+    schema = self._handler(source_type)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/_internal/_generate_schema.py", line 2279, in inner_handler
+    schema = self._generate_schema_inner(obj)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/_internal/_generate_schema.py", line 1009, in _generate_schema_inner
+    return self.match_type(obj)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/_internal/_generate_schema.py", line 1123, in match_type
+    return self._match_generic_type(obj, origin)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/_internal/_generate_schema.py", line 1146, in _match_generic_type
+    return self._union_schema(obj)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/_internal/_generate_schema.py", line 1434, in _union_schema
+    choices.append(self.generate_schema(arg))
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/_internal/_generate_schema.py", line 708, in generate_schema
+    schema = self._generate_schema_from_get_schema_method(obj, obj)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/_internal/_generate_schema.py", line 900, in _generate_schema_from_get_schema_method
+    schema = get_schema(
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/networks.py", line 986, in __get_pydantic_core_schema__
+    import_email_validator()
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/networks.py", line 948, in import_email_validator
+    raise ImportError('email-validator is not installed, run `pip install pydantic[email]`') from e
+ImportError: email-validator is not installed, run `pip install pydantic[email]`
+INFO:     Stopping reloader process [6079]
+INFO:     Will watch for changes in these directories: ['/Users/oscar/projects/CrawlPro/backend']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [8086] using StatReload
+Process SpawnProcess-1:
+Traceback (most recent call last):
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/networks.py", line 946, in import_email_validator
+    import email_validator
+ModuleNotFoundError: No module named 'email_validator'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/oscar/software/miniconda3/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/Users/oscar/software/miniconda3/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/_subprocess.py", line 80, in subprocess_started
+    target(sockets=sockets)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/server.py", line 67, in run
+    return asyncio.run(self.serve(sockets=sockets))
+  File "/Users/oscar/software/miniconda3/lib/python3.10/asyncio/runners.py", line 44, in run
+    return loop.run_until_complete(main)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/asyncio/base_events.py", line 649, in run_until_complete
+    return future.result()
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/server.py", line 71, in serve
+    await self._serve(sockets)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/server.py", line 78, in _serve
+    config.load()
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/config.py", line 436, in load
+    self.loaded_app = import_from_string(self.app)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1050, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1027, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1006, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 688, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 883, in exec_module
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "/Users/oscar/projects/CrawlPro/backend/app/main.py", line 3, in <module>
+    from app.core.lifespan import lifespan
+  File "/Users/oscar/projects/CrawlPro/backend/app/core/lifespan.py", line 7, in <module>
+    from app.services.scheduler import scheduler_service
+  File "/Users/oscar/projects/CrawlPro/backend/app/services/scheduler.py", line 13, in <module>
+    from app import crud
+  File "/Users/oscar/projects/CrawlPro/backend/app/crud/__init__.py", line 1, in <module>
+    from .crud_node import node
+  File "/Users/oscar/projects/CrawlPro/backend/app/crud/crud_node.py", line 8, in <module>
+    from app.schemas.node import NodeCreate, NodeUpdate
+  File "/Users/oscar/projects/CrawlPro/backend/app/schemas/__init__.py", line 2, in <module>
+    from .user import UserBase, UserCreate, UserUpdate, UserUpdateMe, UserUpdatePassword, UserOut
+  File "/Users/oscar/projects/CrawlPro/backend/app/schemas/user.py", line 7, in <module>
+    class UserBase(BaseModel):
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/_internal/_model_construction.py", line 237, in __new__
+    complete_model_class(
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/_internal/_model_construction.py", line 597, in complete_model_class
+    schema = gen_schema.generate_schema(cls)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/_internal/_generate_schema.py", line 711, in generate_schema
+    schema = self._generate_schema_inner(obj)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/_internal/_generate_schema.py", line 1004, in _generate_schema_inner
+    return self._model_schema(obj)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/_internal/_generate_schema.py", line 837, in _model_schema
+    {k: self._generate_md_field_schema(k, v, decorators) for k, v in fields.items()},
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/_internal/_generate_schema.py", line 837, in <dictcomp>
+    {k: self._generate_md_field_schema(k, v, decorators) for k, v in fields.items()},
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/_internal/_generate_schema.py", line 1206, in _generate_md_field_schema
+    common_field = self._common_field_schema(name, field_info, decorators)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/_internal/_generate_schema.py", line 1372, in _common_field_schema
+    schema = self._apply_annotations(
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/_internal/_generate_schema.py", line 2297, in _apply_annotations
+    schema = get_inner_schema(source_type)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/_internal/_schema_generation_shared.py", line 83, in __call__
+    schema = self._handler(source_type)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/_internal/_generate_schema.py", line 2279, in inner_handler
+    schema = self._generate_schema_inner(obj)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/_internal/_generate_schema.py", line 1009, in _generate_schema_inner
+    return self.match_type(obj)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/_internal/_generate_schema.py", line 1123, in match_type
+    return self._match_generic_type(obj, origin)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/_internal/_generate_schema.py", line 1146, in _match_generic_type
+    return self._union_schema(obj)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/_internal/_generate_schema.py", line 1434, in _union_schema
+    choices.append(self.generate_schema(arg))
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/_internal/_generate_schema.py", line 708, in generate_schema
+    schema = self._generate_schema_from_get_schema_method(obj, obj)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/_internal/_generate_schema.py", line 900, in _generate_schema_from_get_schema_method
+    schema = get_schema(
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/networks.py", line 986, in __get_pydantic_core_schema__
+    import_email_validator()
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/pydantic/networks.py", line 948, in import_email_validator
+    raise ImportError('email-validator is not installed, run `pip install pydantic[email]`') from e
+ImportError: email-validator is not installed, run `pip install pydantic[email]`
+INFO:     Stopping reloader process [8086]
+INFO:     Will watch for changes in these directories: ['/Users/oscar/projects/CrawlPro/backend']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [9550] using StatReload
+Process SpawnProcess-1:
+Traceback (most recent call last):
+  File "/Users/oscar/software/miniconda3/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/Users/oscar/software/miniconda3/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/_subprocess.py", line 80, in subprocess_started
+    target(sockets=sockets)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/server.py", line 67, in run
+    return asyncio.run(self.serve(sockets=sockets))
+  File "/Users/oscar/software/miniconda3/lib/python3.10/asyncio/runners.py", line 44, in run
+    return loop.run_until_complete(main)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/asyncio/base_events.py", line 649, in run_until_complete
+    return future.result()
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/server.py", line 71, in serve
+    await self._serve(sockets)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/server.py", line 78, in _serve
+    config.load()
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/config.py", line 436, in load
+    self.loaded_app = import_from_string(self.app)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/importer.py", line 22, in import_from_string
+    raise exc from None
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1050, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1027, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1006, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 688, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 883, in exec_module
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "/Users/oscar/projects/CrawlPro/backend/app/main.py", line 8, in <module>
+    from app.api.v1.api import api_router
+  File "/Users/oscar/projects/CrawlPro/backend/app/api/v1/api.py", line 5, in <module>
+    from app.api.v1.endpoints import auth, users, projects,tasks, nodes, git_credentials, task_runs
+  File "/Users/oscar/projects/CrawlPro/backend/app/api/v1/endpoints/projects.py", line 14, in <module>
+    from app.utils.git_utils import clone_project_from_git
+  File "/Users/oscar/projects/CrawlPro/backend/app/utils/git_utils.py", line 4, in <module>
+    import git
+ModuleNotFoundError: No module named 'git'
+WARNING:  StatReload detected changes in 'app/api/v1/endpoints/projects.py'. Reloading...
+Process SpawnProcess-2:
+Traceback (most recent call last):
+  File "/Users/oscar/software/miniconda3/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/Users/oscar/software/miniconda3/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/_subprocess.py", line 80, in subprocess_started
+    target(sockets=sockets)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/server.py", line 67, in run
+    return asyncio.run(self.serve(sockets=sockets))
+  File "/Users/oscar/software/miniconda3/lib/python3.10/asyncio/runners.py", line 44, in run
+    return loop.run_until_complete(main)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/asyncio/base_events.py", line 649, in run_until_complete
+    return future.result()
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/server.py", line 71, in serve
+    await self._serve(sockets)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/server.py", line 78, in _serve
+    config.load()
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/config.py", line 436, in load
+    self.loaded_app = import_from_string(self.app)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/importer.py", line 22, in import_from_string
+    raise exc from None
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1050, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1027, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1006, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 688, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 883, in exec_module
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "/Users/oscar/projects/CrawlPro/backend/app/main.py", line 8, in <module>
+    from app.api.v1.api import api_router
+  File "/Users/oscar/projects/CrawlPro/backend/app/api/v1/api.py", line 5, in <module>
+    from app.api.v1.endpoints import auth, users, projects,tasks, nodes, git_credentials, task_runs
+  File "/Users/oscar/projects/CrawlPro/backend/app/api/v1/endpoints/projects.py", line 14, in <module>
+    from app.utils.git_utils import clone_project_from_git
+  File "/Users/oscar/projects/CrawlPro/backend/app/utils/git_utils.py", line 4, in <module>
+    import git
+ModuleNotFoundError: No module named 'git'
+INFO:     Stopping reloader process [9550]
+INFO:     Will watch for changes in these directories: ['/Users/oscar/projects/CrawlPro/backend']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [10013] using StatReload
+Process SpawnProcess-1:
+Traceback (most recent call last):
+  File "/Users/oscar/software/miniconda3/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+    self.run()
+  File "/Users/oscar/software/miniconda3/lib/python3.10/multiprocessing/process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/_subprocess.py", line 80, in subprocess_started
+    target(sockets=sockets)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/server.py", line 67, in run
+    return asyncio.run(self.serve(sockets=sockets))
+  File "/Users/oscar/software/miniconda3/lib/python3.10/asyncio/runners.py", line 44, in run
+    return loop.run_until_complete(main)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/asyncio/base_events.py", line 649, in run_until_complete
+    return future.result()
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/server.py", line 71, in serve
+    await self._serve(sockets)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/server.py", line 78, in _serve
+    config.load()
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/config.py", line 436, in load
+    self.loaded_app = import_from_string(self.app)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/importer.py", line 22, in import_from_string
+    raise exc from None
+  File "/Users/oscar/software/miniconda3/lib/python3.10/site-packages/uvicorn/importer.py", line 19, in import_from_string
+    module = importlib.import_module(module_str)
+  File "/Users/oscar/software/miniconda3/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1050, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1027, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1006, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 688, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 883, in exec_module
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "/Users/oscar/projects/CrawlPro/backend/app/main.py", line 8, in <module>
+    from app.api.v1.api import api_router
+  File "/Users/oscar/projects/CrawlPro/backend/app/api/v1/api.py", line 5, in <module>
+    from app.api.v1.endpoints import auth, users, projects,tasks, nodes, git_credentials, task_runs
+  File "/Users/oscar/projects/CrawlPro/backend/app/api/v1/endpoints/projects.py", line 14, in <module>
+    from app.utils.git_utils import clone_project_from_git
+  File "/Users/oscar/projects/CrawlPro/backend/app/utils/git_utils.py", line 4, in <module>
+    import git
+ModuleNotFoundError: No module named 'git'
+INFO:     Stopping reloader process [10013]
+INFO:     Will watch for changes in these directories: ['/Users/oscar/projects/CrawlPro/backend']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [10807] using StatReload
+[32m2025-09-14 00:13:42.221[0m | [1mINFO    [0m | [36mapp.core.logging_config[0m:[36msetup_logging[0m:[36m38[0m - [1mLogger setup complete.[0m
+INFO:     Started server process [10852]
+INFO:     Waiting for application startup.
+[32m2025-09-14 00:13:42.244[0m | [1mINFO    [0m | [36mapp.core.lifespan[0m:[36mlifespan[0m:[36m13[0m - [1m🚀 CrawlPro 正在启动...[0m
+[32m2025-09-14 00:13:42.248[0m | [1mINFO    [0m | [36mapp.core.lifespan[0m:[36mlifespan[0m:[36m26[0m - [1m✅ 数据库连接正常[0m
+[32m2025-09-14 00:13:42.265[0m | [1mINFO    [0m | [36mapp.core.lifespan[0m:[36mlifespan[0m:[36m34[0m - [1m✅ 定时任务调度器已启动[0m
+INFO:     Application startup complete.
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+[32m2025-09-14 00:14:13.718[0m | [1mINFO    [0m | [36mapp.core.lifespan[0m:[36mlifespan[0m:[36m42[0m - [1m🛑 CrawlPro 正在关闭...[0m
+[32m2025-09-14 00:14:13.719[0m | [1mINFO    [0m | [36mapp.core.lifespan[0m:[36mlifespan[0m:[36m45[0m - [1m✅ 调度器已安全关闭[0m
+[32m2025-09-14 00:14:13.719[0m | [1mINFO    [0m | [36mapp.core.lifespan[0m:[36mlifespan[0m:[36m51[0m - [1m✅ 数据库引擎已关闭[0m
+INFO:     Application shutdown complete.
+INFO:     Finished server process [10852]
+INFO:     Stopping reloader process [10807]
+/Users/oscar/software/miniconda3/lib/python3.10/multiprocessing/resource_tracker.py:224: UserWarning: resource_tracker: There appear to be 8 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+INFO:     Will watch for changes in these directories: ['/Users/oscar/projects/CrawlPro/backend']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [12062] using StatReload
+[32m2025-09-14 00:14:17.090[0m | [1mINFO    [0m | [36mapp.core.logging_config[0m:[36msetup_logging[0m:[36m38[0m - [1mLogger setup complete.[0m
+INFO:     Started server process [12109]
+INFO:     Waiting for application startup.
+[32m2025-09-14 00:14:17.112[0m | [1mINFO    [0m | [36mapp.core.lifespan[0m:[36mlifespan[0m:[36m13[0m - [1m🚀 CrawlPro 正在启动...[0m
+[32m2025-09-14 00:14:17.117[0m | [1mINFO    [0m | [36mapp.core.lifespan[0m:[36mlifespan[0m:[36m26[0m - [1m✅ 数据库连接正常[0m
+[32m2025-09-14 00:14:17.131[0m | [1mINFO    [0m | [36mapp.core.lifespan[0m:[36mlifespan[0m:[36m34[0m - [1m✅ 定时任务调度器已启动[0m
+INFO:     Application startup complete.
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+[32m2025-09-14 00:15:21.176[0m | [1mINFO    [0m | [36mapp.core.lifespan[0m:[36mlifespan[0m:[36m42[0m - [1m🛑 CrawlPro 正在关闭...[0m
+[32m2025-09-14 00:15:21.176[0m | [1mINFO    [0m | [36mapp.core.lifespan[0m:[36mlifespan[0m:[36m45[0m - [1m✅ 调度器已安全关闭[0m
+[32m2025-09-14 00:15:21.177[0m | [1mINFO    [0m | [36mapp.core.lifespan[0m:[36mlifespan[0m:[36m51[0m - [1m✅ 数据库引擎已关闭[0m
+INFO:     Application shutdown complete.
+INFO:     Finished server process [12109]
+INFO:     Stopping reloader process [12062]
+/Users/oscar/software/miniconda3/lib/python3.10/multiprocessing/resource_tracker.py:224: UserWarning: resource_tracker: There appear to be 8 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+INFO:     Will watch for changes in these directories: ['/Users/oscar/projects/CrawlPro/backend']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [13799] using StatReload
+[32m2025-09-14 00:15:24.715[0m | [1mINFO    [0m | [36mapp.core.logging_config[0m:[36msetup_logging[0m:[36m38[0m - [1mLogger setup complete.[0m
+INFO:     Started server process [13844]
+INFO:     Waiting for application startup.
+[32m2025-09-14 00:15:24.738[0m | [1mINFO    [0m | [36mapp.core.lifespan[0m:[36mlifespan[0m:[36m13[0m - [1m🚀 CrawlPro 正在启动...[0m
+[32m2025-09-14 00:15:24.743[0m | [1mINFO    [0m | [36mapp.core.lifespan[0m:[36mlifespan[0m:[36m26[0m - [1m✅ 数据库连接正常[0m
+[32m2025-09-14 00:15:24.758[0m | [1mINFO    [0m | [36mapp.core.lifespan[0m:[36mlifespan[0m:[36m34[0m - [1m✅ 定时任务调度器已启动[0m
+INFO:     Application startup complete.
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+[32m2025-09-14 00:16:54.830[0m | [1mINFO    [0m | [36mapp.core.lifespan[0m:[36mlifespan[0m:[36m42[0m - [1m🛑 CrawlPro 正在关闭...[0m
+[32m2025-09-14 00:16:54.831[0m | [1mINFO    [0m | [36mapp.core.lifespan[0m:[36mlifespan[0m:[36m45[0m - [1m✅ 调度器已安全关闭[0m
+[32m2025-09-14 00:16:54.832[0m | [1mINFO    [0m | [36mapp.core.lifespan[0m:[36mlifespan[0m:[36m51[0m - [1m✅ 数据库引擎已关闭[0m
+INFO:     Application shutdown complete.
+INFO:     Finished server process [13844]
+INFO:     Stopping reloader process [13799]
+/Users/oscar/software/miniconda3/lib/python3.10/multiprocessing/resource_tracker.py:224: UserWarning: resource_tracker: There appear to be 8 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
