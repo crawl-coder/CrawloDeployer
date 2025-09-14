@@ -55,17 +55,25 @@ def clone_project_from_git(
 
         if scheme in ['http', 'https']:
             if username and password:
-                clone_url = f"{parsed_url.scheme}://{username}:{'***' if password else ''}@{hostname}{parsed_url.path}"
+                # 对密码进行URL编码以处理特殊字符
+                import urllib.parse
+                encoded_password = urllib.parse.quote(password, safe='')
+                clone_url = f"{parsed_url.scheme}://{username}:{encoded_password}@{hostname}{parsed_url.path}"
                 logger.debug("使用用户名密码进行HTTPS认证")
+            else:
+                logger.warning("HTTP/HTTPS协议需要用户名和密码进行认证")
         elif scheme == 'ssh':
             if ssh_key_path:
                 if not os.path.exists(ssh_key_path):
                     raise ValueError(f"SSH密钥文件未找到: {ssh_key_path}")
                 if not os.access(ssh_key_path, os.R_OK):
                     raise PermissionError(f"无权限读取SSH密钥: {ssh_key_path}")
-                ssh_cmd = f'ssh -i {ssh_key_path} -o StrictHostKeyChecking=no'
+                # 设置SSH命令，包含密钥路径和禁用主机密钥检查
+                ssh_cmd = f'ssh -i "{ssh_key_path}" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
                 git_env['GIT_SSH_COMMAND'] = ssh_cmd
-                logger.debug(f"使用SSH密钥进行认证")
+                logger.debug(f"使用SSH密钥进行认证，密钥路径: {ssh_key_path}")
+            else:
+                logger.warning("SSH协议需要提供SSH密钥路径")
         else:
             raise ValueError(f"不支持的协议: {scheme}")
 
@@ -80,6 +88,7 @@ def clone_project_from_git(
             else:
                 logger.warning(f"目标目录已存在但为空，将被填充: {abs_target_path}")
 
+        logger.info(f"开始执行Git克隆操作...")
         repo = git.Repo.clone_from(
             url=clone_url,
             to_path=target_path,

@@ -20,7 +20,14 @@ def get_local_ip() -> str:
 # --- 基础信息 ---
 HOSTNAME = socket.gethostname()
 LOCAL_IP = get_local_ip()
-WORKER_OS = platform.system().upper()  # 'WINDOWS' or 'LINUX'
+
+# 获取操作系统类型并映射到我们支持的枚举值
+raw_os = platform.system().upper()
+if raw_os == "DARWIN":
+    WORKER_OS = "MACOS"
+else:
+    WORKER_OS = raw_os
+
 WORKER_OS_VERSION = platform.release()  # 更稳定的版本号
 PYTHON_VERSION = platform.python_version()
 

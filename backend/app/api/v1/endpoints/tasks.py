@@ -251,7 +251,8 @@ def run_task_now(
         task_run_in = schemas.TaskRunCreate(
             task_id=task_id,
             celery_task_id=celery_task.id,
-            worker_node="manual_trigger"
+            worker_node="manual_trigger",
+            status="PENDING"  # 添加必需的 status 字段
         )
         task_run = crud_task_run.create(db, obj_in=task_run_in)
         
@@ -364,7 +365,7 @@ def add_task_dependencies(
         # 检查依赖任务是否属于同一用户
         dep_project = crud_project.get(db, id=dep_task.project_id)
         if dep_project.owner_id != current_user.id:
-            raise HTTPException(status_code=403, detail=f"Dependency task {dep_id} not owned by user")
+            raise HTTPException(status_code=403, detail=f"Dependency task {dep_id} owned by user")
     
     # 更新任务依赖
     db_task = crud_task.get(db, id=task_id)
@@ -396,24 +397,5 @@ def get_task_dependencies(
         dep_task = crud_task.get(db, id=dep_id)
         if dep_task:
             dependencies.append(dep_task)
-    
+            
     return dependencies
-
-
-@router.delete("/{task_id}/dependencies", response_model=schemas.TaskOut)
-def clear_task_dependencies(
-    *,
-    task_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: models.User = Depends(deps.get_current_active_user)
-):
-    """
-    清除任务的所有依赖
-    """
-    _check_task_project_permission(db, task_id=task_id, user=current_user)
-    
-    db_task = crud_task.get(db, id=task_id)
-    task_update = schemas.TaskUpdate(dependency_task_ids=[])
-    updated_task = crud_task.update(db, db_obj=db_task, obj_in=task_update)
-    
-    return updated_task

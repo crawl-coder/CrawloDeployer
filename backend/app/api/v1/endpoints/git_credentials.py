@@ -50,6 +50,25 @@ def read_git_credentials(
     return credentials
 
 
+@router.put("/{credential_id}", response_model=schemas.GitCredentialOut)
+def update_git_credential(
+    *,
+    credential_id: int,
+    credential_in: schemas.GitCredentialUpdate,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_active_user)
+):
+    """更新 Git 凭据"""
+    cred = crud_git_cred.get(db, id=credential_id)
+    if not cred:
+        raise HTTPException(status_code=404, detail="Credential not found")
+    if cred.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+    
+    cred = crud_git_cred.update(db, db_obj=cred, obj_in=credential_in)
+    return cred
+
+
 @router.delete("/{credential_id}")
 def delete_git_credential(
     *,

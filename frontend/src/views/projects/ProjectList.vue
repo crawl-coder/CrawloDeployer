@@ -156,9 +156,23 @@
               <template #tip>
                 <div class="el-upload__tip">
                   支持上传ZIP包、Python脚本、文件夹或多个文件
+                  <div class="upload-instructions">
+                    <div><strong>文件夹上传说明：</strong></div>
+                    <div>1. 点击"选择文件/文件夹"按钮</div>
+                    <div>2. 在弹出的文件选择对话框中，按住Ctrl键可以选择多个文件</div>
+                    <div>3. 选择文件夹时，会保持原有目录结构</div>
+                    <div>4. 支持拖拽上传文件/文件夹</div>
+                    <div class="folder-upload-tip">
+                      <strong>提示：</strong>要上传整个文件夹，请在文件选择对话框中选择文件夹而不是其中的文件。
+                      现代浏览器支持直接选择文件夹上传，系统会自动保持文件夹的完整结构。
+                    </div>
+                  </div>
                 </div>
               </template>
             </el-upload>
+            <div v-if="uploadProgress > 0" class="upload-progress">
+              <el-progress :percentage="uploadProgress" />
+            </div>
           </el-form-item>
           
           <template v-if="deployMethod === 'git'">
@@ -169,6 +183,45 @@
             <el-form-item label="分支" prop="git_branch">
               <el-input v-model="projectForm.git_branch" placeholder="请输入分支名称" />
             </el-form-item>
+            
+            <el-form-item label="认证方式">
+              <el-radio-group v-model="gitAuthMethod">
+                <el-radio label="token">Token/密码</el-radio>
+                <el-radio label="ssh">SSH密钥</el-radio>
+              </el-radio-group>
+            </el-form-item>
+            
+            <template v-if="gitAuthMethod === 'token'">
+              <el-alert
+                title="请先在Git凭证管理中添加相应的凭证"
+                type="info"
+                show-icon
+                style="margin-bottom: 15px;"
+              />
+            </template>
+            
+            <template v-if="gitAuthMethod === 'ssh'">
+              <el-form-item label="SSH私钥">
+                <el-input
+                  v-model="projectForm.ssh_key"
+                  type="textarea"
+                  :rows="4"
+                  placeholder="请输入SSH私钥内容（PEM格式）"
+                />
+                <div class="form-tip">
+                  SSH私钥用于通过SSH协议克隆私有仓库，确保私钥格式正确且具有读取权限。
+                </div>
+              </el-form-item>
+              <el-form-item label="SSH公钥指纹">
+                <el-input
+                  v-model="projectForm.ssh_key_fingerprint"
+                  placeholder="请输入SSH公钥指纹（可选）"
+                />
+                <div class="form-tip">
+                  可通过命令 `ssh-keygen -lf /path/to/public_key` 获取指纹，用于验证密钥。
+                </div>
+              </el-form-item>
+            </template>
           </template>
         </template>
       </el-form>
@@ -192,7 +245,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElNotification } from 'element-plus'
 import {
   Search,
   Plus,
@@ -212,12 +265,14 @@ const projectStore = useProjectStore()
 const searchKeyword = ref('')
 const currentPage = ref(1)
 const pageSize = ref(10)
+const uploadProgress = ref(0)
 
 const dialogVisible = ref(false)
 const dialogMode = ref<'create' | 'edit'>('create')
 const dialogTitle = computed(() => dialogMode.value === 'create' ? '创建项目' : '编辑项目')
 
 const deployMethod = ref<'upload' | 'git'>('upload')
+const gitAuthMethod = ref<'token' | 'ssh'>('token')
 const fileList = ref<UploadUserFile[]>([])
 
 // 表单引用
@@ -232,7 +287,9 @@ const projectForm = reactive({
   version: '1.0.0',
   entrypoint: 'run.py',
   git_repo_url: '',
-  git_branch: 'main'
+  git_branch: 'main',
+  ssh_key: '',
+  ssh_key_fingerprint: ''
 })
 
 // 表单验证规则
@@ -362,13 +419,26 @@ const handleSaveProject = async () => {
             description: projectForm.description,
             git_repo_url: deployMethod.value === 'git' ? projectForm.git_repo_url : undefined,
             git_branch: deployMethod.value === 'git' ? projectForm.git_branch : undefined,
+            ssh_key: deployMethod.value === 'git' && gitAuthMethod.value === 'ssh' ? projectForm.ssh_key : undefined,
+            ssh_key_fingerprint: deployMethod.value === 'git' && gitAuthMethod.value === 'ssh' ? projectForm.ssh_key_fingerprint : undefined,
             // 添加文件上传支持
             file: validFiles.length > 0 ? validFiles[0] : undefined,
-            files: validFiles.length > 1 ? validFiles : 
-                   (validFiles.length === 1 ? [validFiles[0]] : undefined)
+            files: validFiles.length > 0 ? validFiles : undefined
+          }
+          
+          // 显示上传进度通知
+          if (validFiles.length > 0) {
+            ElNotification({
+              title: '文件上传',
+              message: '正在上传文件，请稍候...',
+              duration: 0
+            })
           }
           
           result = await projectStore.createNewProject(projectData)
+          
+          // 关闭上传进度通知
+          ElNotification.closeAll()
         } else {
           // 更新项目
           const projectData: ProjectUpdate = {
@@ -390,6 +460,7 @@ const handleSaveProject = async () => {
           ElMessage.error(result.message || (dialogMode.value === 'create' ? '创建失败' : '更新失败'))
         }
       } catch (error) {
+        ElNotification.closeAll()
         ElMessage.error(dialogMode.value === 'create' ? '创建失败' : '更新失败')
       }
     }
@@ -414,8 +485,12 @@ const resetForm = () => {
   projectForm.entrypoint = 'run.py'
   projectForm.git_repo_url = ''
   projectForm.git_branch = 'main'
+  projectForm.ssh_key = ''
+  projectForm.ssh_key_fingerprint = ''
   fileList.value = []
   deployMethod.value = 'upload'
+  gitAuthMethod.value = 'token'
+  uploadProgress.value = 0
   
   if (projectFormRef.value) {
     projectFormRef.value.resetFields()
@@ -485,5 +560,28 @@ watch([currentPage, pageSize], async () => {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+}
+
+.upload-instructions {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #666;
+}
+
+.upload-instructions div {
+  margin: 2px 0;
+}
+
+.folder-upload-tip {
+  margin-top: 8px;
+  padding: 8px;
+  background-color: #f0f9ff;
+  border: 1px solid #b3d9ff;
+  border-radius: 4px;
+  color: #409eff;
+}
+
+.upload-progress {
+  margin-top: 15px;
 }
 </style>

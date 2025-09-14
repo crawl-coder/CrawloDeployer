@@ -1,144 +1,172 @@
 <template>
-  <div class="project-detail" v-loading="projectStore.loading">
-    <el-page-header @back="goBack">
-      <template #content>
-        <span class="page-title">{{ projectStore.currentProject?.name || '项目详情' }}</span>
-      </template>
-    </el-page-header>
+  <div class="project-detail" v-loading="loading">
+    <el-page-header @back="goBack" :content="project?.name" />
     
-    <div v-if="projectStore.currentProject" class="content">
-      <!-- 项目基本信息 -->
-      <el-card class="info-card">
-        <template #header>
-          <div class="card-header">
-            <span>基本信息</span>
-            <el-button type="primary" @click="handleEditProject">编辑</el-button>
-          </div>
-        </template>
+    <el-row :gutter="20" style="margin-top: 20px;">
+      <el-col :span="16">
+        <el-card class="project-info-card">
+          <template #header>
+            <div class="card-header">
+              <span>项目信息</span>
+              <el-button type="primary" @click="handleEditProject">编辑</el-button>
+            </div>
+          </template>
+          
+          <el-descriptions :column="1" border>
+            <el-descriptions-item label="项目名称">{{ project?.name }}</el-descriptions-item>
+            <el-descriptions-item label="描述">{{ project?.description }}</el-descriptions-item>
+            <el-descriptions-item label="状态">
+              <el-tag :type="getStatusTagType(project?.status)">
+                {{ getStatusText(project?.status) }}
+              </el-tag>
+            </el-descriptions-item>
+            <el-descriptions-item label="版本">{{ project?.version }}</el-descriptions-item>
+            <el-descriptions-item label="入口文件">{{ project?.entrypoint }}</el-descriptions-item>
+            <el-descriptions-item label="创建时间">{{ formatDate(project?.created_at) }}</el-descriptions-item>
+            <el-descriptions-item label="项目路径">{{ project?.package_path }}</el-descriptions-item>
+          </el-descriptions>
+        </el-card>
         
-        <el-descriptions :column="2" border>
-          <el-descriptions-item label="项目名称">
-            {{ projectStore.currentProject.name }}
-          </el-descriptions-item>
-          <el-descriptions-item label="状态">
-            <el-tag :type="getStatusTagType(projectStore.currentProject.status)">
-              {{ getStatusText(projectStore.currentProject.status) }}
-            </el-tag>
-          </el-descriptions-item>
-          <el-descriptions-item label="版本">
-            {{ projectStore.currentProject.version }}
-          </el-descriptions-item>
-          <el-descriptions-item label="入口文件">
-            {{ projectStore.currentProject.entrypoint }}
-          </el-descriptions-item>
-          <el-descriptions-item label="创建时间" :span="2">
-            {{ formatDate(projectStore.currentProject.created_at) }}
-          </el-descriptions-item>
-          <el-descriptions-item label="描述" :span="2">
-            {{ projectStore.currentProject.description || '-' }}
-          </el-descriptions-item>
-        </el-descriptions>
-      </el-card>
+        <el-card class="project-files-card" style="margin-top: 20px;">
+          <template #header>
+            <div class="card-header">
+              <span>项目文件</span>
+              <el-button @click="refreshFiles">刷新</el-button>
+            </div>
+          </template>
+          
+          <el-table :data="projectFiles" style="width: 100%">
+            <el-table-column prop="name" label="文件名">
+              <template #default="{ row }">
+                <el-icon v-if="row.type === 'directory'"><Folder /></el-icon>
+                <el-icon v-else><Document /></el-icon>
+                {{ row.name }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="size" label="大小" width="120">
+              <template #default="{ row }">
+                {{ formatFileSize(row.size) }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="modified" label="修改时间" width="180">
+              <template #default="{ row }">
+                {{ formatDate(row.modified) }}
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-card>
+      </el-col>
       
-      <!-- Git凭证管理 -->
-      <el-card class="git-card">
-        <template #header>
-          <div class="card-header">
-            <span>Git凭证管理</span>
-            <el-button type="primary" @click="goToGitCredentials">管理Git凭证</el-button>
+      <el-col :span="8">
+        <el-card class="project-actions-card">
+          <template #header>
+            <div class="card-header">
+              <span>项目操作</span>
+            </div>
+          </template>
+          
+          <div class="action-buttons">
+            <el-button type="primary" @click="handleSyncToNodes" style="width: 100%; margin-bottom: 10px;">
+              <el-icon><Upload /></el-icon>
+              同步到节点
+            </el-button>
+            
+            <el-button @click="handleViewEnvVars" style="width: 100%; margin-bottom: 10px;">
+              <el-icon><Setting /></el-icon>
+              环境变量
+            </el-button>
+            
+            <el-button @click="handleViewTasks" style="width: 100%; margin-bottom: 10px;">
+              <el-icon><List /></el-icon>
+              任务管理
+            </el-button>
+            
+            <el-button type="danger" @click="handleDeleteProject" style="width: 100%;">
+              <el-icon><Delete /></el-icon>
+              删除项目
+            </el-button>
           </div>
-        </template>
+        </el-card>
+        
+        <el-card class="project-stats-card" style="margin-top: 20px;">
+          <template #header>
+            <div class="card-header">
+              <span>项目统计</span>
+            </div>
+          </template>
+          
+          <div class="stats-content">
+            <div class="stat-item">
+              <div class="stat-label">任务数</div>
+              <div class="stat-value">{{ projectStats?.taskCount || 0 }}</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">执行次数</div>
+              <div class="stat-value">{{ projectStats?.runCount || 0 }}</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">成功率</div>
+              <div class="stat-value">{{ projectStats?.successRate || 0 }}%</div>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
+    
+    <!-- 同步到节点对话框 -->
+    <el-dialog
+      v-model="syncDialogVisible"
+      title="同步项目到节点"
+      width="600px"
+    >
+      <el-form
+        ref="syncFormRef"
+        :model="syncForm"
+        :rules="syncRules"
+        label-width="100px"
+      >
+        <el-form-item label="选择节点" prop="nodeIds">
+          <el-select
+            v-model="syncForm.nodeIds"
+            multiple
+            placeholder="请选择要同步到的节点"
+            style="width: 100%"
+          >
+            <el-option
+              v-for="node in onlineNodes"
+              :key="node.id"
+              :label="`${node.hostname} (${node.ip_address})`"
+              :value="node.id"
+            />
+          </el-select>
+        </el-form-item>
         
         <el-alert
-          title="提示"
-          description="在创建Git项目时，系统将使用您配置的Git凭证进行身份验证。请确保已正确配置凭证。"
+          title="项目文件将被同步到选中的节点上，确保节点可以访问主节点的文件系统或网络共享"
           type="info"
           show-icon
         />
-      </el-card>
+      </el-form>
       
-      <!-- 环境变量配置 -->
-      <el-card class="env-card">
-        <template #header>
-          <div class="card-header">
-            <span>环境变量</span>
-            <el-button type="primary" @click="handleEditEnvVars">编辑环境变量</el-button>
-          </div>
-        </template>
-        
-        <el-table
-          :data="envVarsList"
-          style="width: 100%"
-          empty-text="暂无环境变量"
-        >
-          <el-table-column prop="key" label="变量名" width="200" />
-          <el-table-column prop="value" label="变量值" />
-        </el-table>
-      </el-card>
-      
-      <!-- 项目任务 -->
-      <el-card class="tasks-card">
-        <template #header>
-          <div class="card-header">
-            <span>项目任务</span>
-            <el-button type="primary" @click="handleCreateTask">
-              <el-icon><Plus /></el-icon>
-              创建任务
-            </el-button>
-          </div>
-        </template>
-        
-        <el-table
-          :data="projectTasks"
-          style="width: 100%"
-          v-loading="tasksLoading"
-        >
-          <el-table-column prop="name" label="任务名称" min-width="150">
-            <template #default="{ row }">
-              <el-link type="primary" @click="goToTaskDetail(row.id)">
-                {{ row.name }}
-              </el-link>
-            </template>
-          </el-table-column>
-          <el-table-column prop="spider_name" label="爬虫名称" width="150" />
-          <el-table-column prop="cron_expression" label="调度表达式" width="150" />
-          <el-table-column prop="is_enabled" label="状态" width="100">
-            <template #default="{ row }">
-              <el-switch
-                v-model="row.is_enabled"
-                @change="toggleTaskStatus(row)"
-              />
-            </template>
-          </el-table-column>
-          <el-table-column prop="last_run_time" label="最后执行" width="180">
-            <template #default="{ row }">
-              {{ row.last_run_time ? formatDate(row.last_run_time) : '-' }}
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" width="200">
-            <template #default="{ row }">
-              <el-button link @click="handleRunTask(row)">立即执行</el-button>
-              <el-button link @click="handleEditTask(row)">编辑</el-button>
-              <el-popconfirm
-                title="确定要删除这个任务吗？"
-                @confirm="handleDeleteTask(row.id)"
-              >
-                <template #reference>
-                  <el-button link type="danger">删除</el-button>
-                </template>
-              </el-popconfirm>
-            </template>
-          </el-table-column>
-        </el-table>
-      </el-card>
-    </div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="syncDialogVisible = false">取消</el-button>
+          <el-button
+            type="primary"
+            :loading="syncing"
+            @click="handleSyncConfirm"
+          >
+            确定同步
+          </el-button>
+        </span>
+      </template>
+    </el-dialog>
     
     <!-- 编辑项目对话框 -->
     <el-dialog
       v-model="editDialogVisible"
       title="编辑项目"
       width="600px"
-      @close="handleEditDialogClose"
     >
       <el-form
         ref="editFormRef"
@@ -181,57 +209,8 @@
           <el-button @click="editDialogVisible = false">取消</el-button>
           <el-button
             type="primary"
-            :loading="projectStore.loading"
-            @click="handleSaveProject"
-          >
-            确定
-          </el-button>
-        </span>
-      </template>
-    </el-dialog>
-    
-    <!-- 编辑环境变量对话框 -->
-    <el-dialog
-      v-model="envDialogVisible"
-      title="编辑环境变量"
-      width="600px"
-      @close="handleEnvDialogClose"
-    >
-      <el-table :data="envVarsEditList" style="width: 100%">
-        <el-table-column label="变量名" width="200">
-          <template #default="{ row }">
-            <el-input v-model="row.key" placeholder="变量名" />
-          </template>
-        </el-table-column>
-        <el-table-column label="变量值">
-          <template #default="{ row }">
-            <el-input v-model="row.value" placeholder="变量值" />
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="80">
-          <template #default="{ $index }">
-            <el-button
-              type="danger"
-              link
-              @click="removeEnvVar($index)"
-            >
-              删除
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-      
-      <div style="margin-top: 15px;">
-        <el-button @click="addEnvVar">添加变量</el-button>
-      </div>
-      
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="envDialogVisible = false">取消</el-button>
-          <el-button
-            type="primary"
-            :loading="projectStore.loading"
-            @click="handleSaveEnvVars"
+            :loading="updating"
+            @click="handleUpdateProject"
           >
             确定
           </el-button>
@@ -242,11 +221,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, watch } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
-import { Plus } from '@element-plus/icons-vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import {
+  Folder,
+  Document,
+  Upload,
+  Setting,
+  List,
+  Delete
+} from '@element-plus/icons-vue'
 import { useProjectStore } from '@/store/project'
+import { useNodeStore } from '@/store/node'
+import { useTaskStore } from '@/store/task'
 import type { ProjectUpdate } from '@/types/project'
 import type { FormInstance, FormRules } from 'element-plus'
 
@@ -256,33 +244,50 @@ const router = useRouter()
 
 // Store
 const projectStore = useProjectStore()
+const nodeStore = useNodeStore()
+const taskStore = useTaskStore()
 
 // 响应式数据
-const tasksLoading = ref(false)
-const projectTasks = ref<any[]>([])
-
+const loading = ref(false)
+const syncing = ref(false)
+const updating = ref(false)
+const syncDialogVisible = ref(false)
 const editDialogVisible = ref(false)
-const envDialogVisible = ref(false)
+
+const project = ref<any>(null)
+const projectFiles = ref<any[]>([])
+const projectStats = ref<any>(null)
 
 // 表单引用
+const syncFormRef = ref<FormInstance>()
 const editFormRef = ref<FormInstance>()
 
-// 编辑表单数据
+// 表单数据
+const syncForm = reactive({
+  nodeIds: [] as number[]
+})
+
 const editForm = reactive({
   name: '',
   description: '',
   status: 'DEVELOPING' as 'DEVELOPING' | 'ONLINE' | 'OFFLINE',
-  version: '',
-  entrypoint: ''
+  version: '1.0.0',
+  entrypoint: 'run.py'
 })
 
 // 表单验证规则
+const syncRules = reactive<FormRules>({
+  nodeIds: [
+    { required: true, message: '请选择要同步到的节点', trigger: 'change' }
+  ]
+})
+
 const editRules = reactive<FormRules>({
   name: [
     { required: true, message: '请输入项目名称', trigger: 'blur' }
   ],
   status: [
-    { required: true, message: '请选择项目状态', trigger: 'change' }
+    { required: true, message: '请选择状态', trigger: 'change' }
   ],
   version: [
     { required: true, message: '请输入版本号', trigger: 'blur' }
@@ -292,19 +297,8 @@ const editRules = reactive<FormRules>({
   ]
 })
 
-// 环境变量编辑列表
-const envVarsEditList = ref<Array<{ key: string; value: string }>>([])
-
 // 计算属性
-const envVarsList = computed(() => {
-  const envTemplate = projectStore.currentProject?.env_template
-  if (!envTemplate) return []
-  
-  return Object.entries(envTemplate).map(([key, value]) => ({
-    key,
-    value
-  }))
-})
+const onlineNodes = computed(() => nodeStore.onlineNodes)
 
 // 方法
 const goBack = () => {
@@ -339,65 +333,118 @@ const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleString('zh-CN')
 }
 
-const handleEditProject = () => {
-  if (projectStore.currentProject) {
-    editForm.name = projectStore.currentProject.name
-    editForm.description = projectStore.currentProject.description
-    editForm.status = projectStore.currentProject.status
-    editForm.version = projectStore.currentProject.version
-    editForm.entrypoint = projectStore.currentProject.entrypoint
-    editDialogVisible.value = true
+const formatFileSize = (bytes: number) => {
+  if (bytes === 0) return '0 Bytes'
+  const k = 1024
+  const sizes = ['Bytes', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+}
+
+const fetchProjectDetail = async () => {
+  loading.value = true
+  try {
+    const projectId = Number(route.params.id)
+    const result = await projectStore.fetchProjectById(projectId)
+    if (result.success) {
+      project.value = result.data
+      editForm.name = project.value.name
+      editForm.description = project.value.description
+      editForm.status = project.value.status
+      editForm.version = project.value.version
+      editForm.entrypoint = project.value.entrypoint
+    } else {
+      ElMessage.error(result.message || '获取项目详情失败')
+    }
+  } catch (error) {
+    ElMessage.error('获取项目详情失败')
+  } finally {
+    loading.value = false
   }
 }
 
-const handleEditEnvVars = () => {
-  const envTemplate = projectStore.currentProject?.env_template || {}
-  envVarsEditList.value = Object.entries(envTemplate).map(([key, value]) => ({
-    key,
-    value
-  }))
-  envDialogVisible.value = true
+const refreshFiles = async () => {
+  try {
+    const projectId = Number(route.params.id)
+    const result = await projectStore.getProjectFiles(projectId)
+    if (result.success) {
+      // 转换文件数据格式
+      projectFiles.value = result.data.map((file: string) => ({
+        name: file,
+        type: file.endsWith('/') ? 'directory' : 'file',
+        size: 0, // 实际应用中可以从API获取
+        modified: new Date().toISOString() // 实际应用中可以从API获取
+      }))
+    } else {
+      ElMessage.error(result.message || '获取项目文件失败')
+    }
+  } catch (error) {
+    ElMessage.error('获取项目文件失败')
+  }
 }
 
-const goToGitCredentials = () => {
-  router.push('/git-credentials')
+const fetchProjectStats = async () => {
+  try {
+    const projectId = Number(route.params.id)
+    const result = await projectStore.getProjectStats(projectId)
+    if (result.success) {
+      projectStats.value = result.data
+    } else {
+      ElMessage.error(result.message || '获取项目统计失败')
+    }
+  } catch (error) {
+    ElMessage.error('获取项目统计失败')
+  }
 }
 
-const handleCreateTask = () => {
-  // 跳转到创建任务页面，传递项目ID
-  router.push(`/tasks?projectId=${route.params.id}`)
+const handleSyncToNodes = () => {
+  syncForm.nodeIds = []
+  syncDialogVisible.value = true
 }
 
-const handleEditTask = (task: any) => {
-  // 跳转到编辑任务页面
-  router.push(`/tasks/${task.id}`)
+const handleSyncConfirm = async () => {
+  if (!syncFormRef.value) return
+  
+  await syncFormRef.value.validate(async (valid) => {
+    if (valid) {
+      syncing.value = true
+      try {
+        // 获取选中节点的主机名
+        const selectedNodes = nodeStore.nodes.filter(node => 
+          syncForm.nodeIds.includes(node.id)
+        )
+        const nodeHostnames = selectedNodes.map(node => node.hostname)
+        
+        const result = await projectStore.syncProjectToNodes(
+          project.value.id,
+          nodeHostnames
+        )
+        
+        if (result.success) {
+          ElMessage.success('项目同步成功')
+          syncDialogVisible.value = false
+        } else {
+          ElMessage.error(result.message || '项目同步失败')
+        }
+      } catch (error) {
+        ElMessage.error('项目同步失败')
+      } finally {
+        syncing.value = false
+      }
+    }
+  })
 }
 
-const handleRunTask = (task: any) => {
-  // 立即执行任务
-  ElMessage.info(`立即执行任务: ${task.name}`)
+const handleEditProject = () => {
+  editDialogVisible.value = true
 }
 
-const handleDeleteTask = (id: number) => {
-  // 删除任务
-  ElMessage.info(`删除任务 ID: ${id}`)
-}
-
-const toggleTaskStatus = (task: any) => {
-  // 切换任务状态
-  ElMessage.info(`切换任务状态: ${task.name}`)
-}
-
-const goToTaskDetail = (id: number) => {
-  // 跳转到任务详情
-  router.push(`/tasks/${id}`)
-}
-
-const handleSaveProject = async () => {
-  if (!editFormRef.value || !projectStore.currentProject) return
+const handleUpdateProject = async () => {
+  if (!editFormRef.value) return
   
   await editFormRef.value.validate(async (valid) => {
     if (valid) {
+      updating.value = true
       try {
         const projectData: ProjectUpdate = {
           name: editForm.name,
@@ -408,148 +455,74 @@ const handleSaveProject = async () => {
         }
         
         const result = await projectStore.updateExistingProject(
-          projectStore.currentProject!.id,
+          project.value.id,
           projectData
         )
         
         if (result.success) {
           ElMessage.success('更新成功')
           editDialogVisible.value = false
+          await fetchProjectDetail()
         } else {
           ElMessage.error(result.message || '更新失败')
         }
       } catch (error) {
         ElMessage.error('更新失败')
+      } finally {
+        updating.value = false
       }
     }
   })
 }
 
-const handleEditDialogClose = () => {
-  if (editFormRef.value) {
-    editFormRef.value.resetFields()
-  }
+const handleViewEnvVars = () => {
+  router.push(`/projects/${project.value.id}/env-vars`)
 }
 
-const addEnvVar = () => {
-  envVarsEditList.value.push({ key: '', value: '' })
+const handleViewTasks = () => {
+  router.push(`/projects/${project.value.id}/tasks`)
 }
 
-const removeEnvVar = (index: number) => {
-  envVarsEditList.value.splice(index, 1)
-}
-
-const handleSaveEnvVars = async () => {
-  if (!projectStore.currentProject) return
-  
-  try {
-    // 转换为对象格式
-    const envVars: Record<string, string> = {}
-    envVarsEditList.value.forEach(item => {
-      if (item.key) {
-        envVars[item.key] = item.value
-      }
-    })
-    
-    const result = await projectStore.updateProjectEnvVarsAction(
-      projectStore.currentProject.id,
-      envVars
-    )
-    
-    if (result.success) {
-      ElMessage.success('环境变量更新成功')
-      envDialogVisible.value = false
-    } else {
-      ElMessage.error(result.message || '环境变量更新失败')
+const handleDeleteProject = () => {
+  ElMessageBox.confirm(
+    '确定要删除这个项目吗？此操作不可恢复！',
+    '警告',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
     }
-  } catch (error) {
-    ElMessage.error('环境变量更新失败')
-  }
-}
-
-const handleEnvDialogClose = () => {
-  envVarsEditList.value = []
-}
-
-// 获取项目详情
-const fetchProjectDetail = async (id: number) => {
-  await projectStore.fetchProject(id)
-}
-
-// 获取项目任务
-const fetchProjectTasks = async (projectId: number) => {
-  tasksLoading.value = true
-  try {
-    // 模拟获取任务数据
-    projectTasks.value = [
-      {
-        id: 1,
-        name: '电商网站爬虫',
-        spider_name: 'ecommerce_spider',
-        cron_expression: '0 0 * * *',
-        is_enabled: true,
-        last_run_time: '2023-12-01T10:30:25'
-      },
-      {
-        id: 2,
-        name: '新闻网站采集',
-        spider_name: 'news_spider',
-        cron_expression: '*/30 * * * *',
-        is_enabled: false,
-        last_run_time: null
+  ).then(async () => {
+    try {
+      const result = await projectStore.deleteExistingProject(project.value.id)
+      if (result.success) {
+        ElMessage.success('删除成功')
+        router.push('/projects')
+      } else {
+        ElMessage.error(result.message || '删除失败')
       }
-    ]
-    console.log(`获取项目 ${projectId} 的任务列表`)
-  } catch (error) {
-    ElMessage.error('获取任务列表失败')
-  } finally {
-    tasksLoading.value = false
-  }
+    } catch (error) {
+      ElMessage.error('删除失败')
+    }
+  }).catch(() => {
+    // 用户取消删除
+  })
 }
 
 // 生命周期
 onMounted(async () => {
-  const projectId = Number(route.params.id)
-  if (projectId) {
-    await fetchProjectDetail(projectId)
-    await fetchProjectTasks(projectId)
-  }
+  await fetchProjectDetail()
+  await refreshFiles()
+  await fetchProjectStats()
+  
+  // 获取节点列表
+  await nodeStore.fetchNodes()
 })
-
-// 监听路由变化
-watch(
-  () => route.params.id,
-  async (newId) => {
-    if (newId) {
-      const projectId = Number(newId)
-      await fetchProjectDetail(projectId)
-      await fetchProjectTasks(projectId)
-    }
-  }
-)
 </script>
 
 <style scoped>
 .project-detail {
   padding: 20px;
-}
-
-.page-title {
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.content {
-  margin-top: 20px;
-}
-
-.info-card,
-.env-card,
-.git-card,
-.tasks-card {
-  margin-bottom: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 }
 
 .card-header {
@@ -558,9 +531,29 @@ watch(
   align-items: center;
 }
 
-.dialog-footer {
+.action-buttons {
   display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+  flex-direction: column;
+}
+
+.stats-content {
+  display: flex;
+  justify-content: space-around;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #606266;
+  margin-bottom: 5px;
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: bold;
+  color: #303133;
 }
 </style>

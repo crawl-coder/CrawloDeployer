@@ -22,7 +22,8 @@ class CRUDNode(CRUDBase[Node, NodeCreate, NodeUpdate]):
         else:
             node_update = NodeUpdate(ip_address=ip_address, os=os)
             node = self.update(db, db_obj=node, obj_in=node_update)
-        node.status = "ONLINE"
+        # 确保显式设置状态为ONLINE
+        node.status = NodeStatus.ONLINE
         node.last_heartbeat = datetime.datetime.utcnow()
         db.add(node)
         db.commit()

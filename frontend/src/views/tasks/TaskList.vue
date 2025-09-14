@@ -201,7 +201,71 @@
               <el-input v-model="taskForm.entrypoint" placeholder="如: run.py" />
             </el-form-item>
           </el-col>
+          
+          <el-col :span="12">
+            <el-form-item label="执行器类型">
+              <el-select v-model="taskForm.executorType" placeholder="选择执行器类型" style="width: 100%">
+                <el-option label="通用脚本" value="generic" />
+                <el-option label="Crawlo爬虫" value="crawlo" />
+                <el-option label="Scrapy爬虫" value="scrapy" />
+              </el-select>
+            </el-form-item>
+          </el-col>
         </el-row>
+        
+        <!-- Crawlo特定选项 -->
+        <div v-if="taskForm.executorType === 'crawlo'">
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="爬虫名称">
+                <el-input v-model="taskForm.crawloSpiderName" placeholder="如: myspider 或 all" />
+              </el-form-item>
+            </el-col>
+            
+            <el-col :span="12">
+              <el-form-item label="输出格式">
+                <el-checkbox v-model="taskForm.crawloJsonOutput">JSON输出</el-checkbox>
+                <el-checkbox v-model="taskForm.crawloNoStats">无统计信息</el-checkbox>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </div>
+        
+        <!-- Scrapy特定选项 -->
+        <div v-if="taskForm.executorType === 'scrapy'">
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="爬虫名称">
+                <el-input v-model="taskForm.scrapySpiderName" placeholder="如: myspider" />
+              </el-form-item>
+            </el-col>
+            
+            <el-col :span="12">
+              <el-form-item label="输出设置">
+                <el-input v-model="taskForm.scrapyOutputFile" placeholder="输出文件名" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="输出格式">
+                <el-select v-model="taskForm.scrapyOutputFormat" placeholder="选择输出格式" style="width: 100%">
+                  <el-option label="JSON" value="json" />
+                  <el-option label="CSV" value="csv" />
+                  <el-option label="XML" value="xml" />
+                  <el-option label="默认" value="" />
+                </el-select>
+              </el-form-item>
+            </el-col>
+            
+            <el-col :span="12">
+              <el-form-item label="日志设置">
+                <el-checkbox v-model="taskForm.scrapyNoLog">禁用日志</el-checkbox>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </div>
         
         <el-form-item label="执行参数">
           <el-input
@@ -232,6 +296,75 @@
             placeholder="多个邮箱用逗号分隔"
           />
         </el-form-item>
+        
+        <!-- 节点绑定设置 -->
+        <el-divider content-position="left">节点绑定设置</el-divider>
+        
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="分发模式">
+              <el-select v-model="taskForm.distribution_mode" placeholder="选择分发模式" style="width: 100%">
+                <el-option label="任意节点" value="ANY" />
+                <el-option label="指定单个节点" value="SPECIFIC" />
+                <el-option label="指定多个节点" value="MULTIPLE" />
+                <el-option label="基于标签分发" value="TAG_BASED" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        
+        <!-- 指定单个节点 -->
+        <el-row v-if="taskForm.distribution_mode === 'SPECIFIC'" :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="目标节点">
+              <el-select
+                v-model="taskForm.target_node_id"
+                placeholder="请选择目标节点"
+                style="width: 100%"
+              >
+                <el-option
+                  v-for="node in nodeStore.nodes"
+                  :key="node.id"
+                  :label="`${node.hostname} (${node.ip_address})`"
+                  :value="node.id"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        
+        <!-- 指定多个节点 -->
+        <el-row v-if="taskForm.distribution_mode === 'MULTIPLE'" :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="目标节点">
+              <el-select
+                v-model="taskForm.target_node_ids"
+                multiple
+                placeholder="请选择目标节点"
+                style="width: 100%"
+              >
+                <el-option
+                  v-for="node in nodeStore.nodes"
+                  :key="node.id"
+                  :label="`${node.hostname} (${node.ip_address})`"
+                  :value="node.id"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        
+        <!-- 基于标签分发 -->
+        <el-row v-if="taskForm.distribution_mode === 'TAG_BASED'" :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="节点标签">
+              <el-input
+                v-model="taskForm.target_node_tags"
+                placeholder="请输入节点标签"
+              />
+            </el-form-item>
+          </el-col>
+        </el-row>
         
         <el-form-item v-if="dialogMode === 'edit'" label="任务依赖">
           <el-select
@@ -332,6 +465,7 @@ import {
 } from '@element-plus/icons-vue'
 import { useTaskStore } from '@/store/task'
 import { useProjectStore } from '@/store/project'
+import { useNodeStore } from '@/store/node'  // 添加节点store
 import type { TaskCreate, TaskUpdate } from '@/types/task'
 import type { FormInstance, FormRules } from 'element-plus'
 
@@ -342,6 +476,7 @@ const router = useRouter()
 // Store
 const taskStore = useTaskStore()
 const projectStore = useProjectStore()
+const nodeStore = useNodeStore()  // 添加节点store
 
 // 响应式数据
 const searchKeyword = ref('')
@@ -372,7 +507,23 @@ const taskForm = reactive({
   notify_on_success: false,
   notification_emails: '',
   entrypoint: 'run.py',
-  dependency_task_ids: [] as number[]
+  dependency_task_ids: [] as number[],
+  // 执行器类型
+  executorType: 'generic' as 'generic' | 'crawlo' | 'scrapy',
+  // Crawlo相关字段
+  crawloSpiderName: 'all',
+  crawloJsonOutput: false,
+  crawloNoStats: false,
+  // Scrapy相关字段
+  scrapySpiderName: '',
+  scrapyOutputFile: '',
+  scrapyOutputFormat: '',
+  scrapyNoLog: false,
+  // 节点绑定相关字段
+  distribution_mode: 'ANY' as 'ANY' | 'SPECIFIC' | 'MULTIPLE' | 'TAG_BASED',
+  target_node_id: undefined as number | undefined,
+  target_node_ids: [] as number[],
+  target_node_tags: ''
 })
 
 // CRON表达式生成器表单
@@ -505,6 +656,40 @@ const handleEditTask = (task: any) => {
   taskForm.notify_on_success = task.notify_on_success
   taskForm.notification_emails = task.notification_emails?.join(', ') || ''
   taskForm.dependency_task_ids = task.dependency_task_ids || []
+  // 节点绑定相关字段
+  taskForm.distribution_mode = task.distribution_mode || 'ANY'
+  taskForm.target_node_id = task.target_node_id || undefined
+  taskForm.target_node_ids = task.target_node_ids || []
+  taskForm.target_node_tags = task.target_node_tags || ''
+  
+  // 检查是否是Crawlo任务
+  if (task.args && task.args.crawlo_command) {
+    taskForm.executorType = 'crawlo'
+    taskForm.crawloSpiderName = task.args.spider_name || 'all'
+    taskForm.crawloJsonOutput = !!task.args.json_output
+    taskForm.crawloNoStats = !!task.args.no_stats
+  } 
+  // 检查是否是Scrapy任务
+  else if (task.args && task.args.scrapy_command) {
+    taskForm.executorType = 'scrapy'
+    taskForm.scrapySpiderName = task.args.spider_name || ''
+    taskForm.scrapyOutputFile = task.args.output_file || ''
+    taskForm.scrapyOutputFormat = task.args.output_format || ''
+    taskForm.scrapyNoLog = !!task.args.no_log
+  }
+  // 默认为通用脚本
+  else {
+    taskForm.executorType = 'generic'
+    // 重置特定字段
+    taskForm.crawloSpiderName = 'all'
+    taskForm.crawloJsonOutput = false
+    taskForm.crawloNoStats = false
+    taskForm.scrapySpiderName = ''
+    taskForm.scrapyOutputFile = ''
+    taskForm.scrapyOutputFormat = ''
+    taskForm.scrapyNoLog = false
+  }
+  
   dialogVisible.value = true
 }
 
@@ -569,6 +754,34 @@ const handleSaveTask = async () => {
           }
         }
         
+        // 如果是Crawlo任务，添加Crawlo特定参数
+        if (taskForm.executorType === 'crawlo') {
+          args = args || {}
+          args.crawlo_command = true
+          args.spider_name = taskForm.crawloSpiderName || 'all'
+          if (taskForm.crawloJsonOutput) {
+            args.json_output = true
+          }
+          if (taskForm.crawloNoStats) {
+            args.no_stats = true
+          }
+        }
+        // 如果是Scrapy任务，添加Scrapy特定参数
+        else if (taskForm.executorType === 'scrapy') {
+          args = args || {}
+          args.scrapy_command = true
+          args.spider_name = taskForm.scrapySpiderName || 'default'
+          if (taskForm.scrapyOutputFile) {
+            args.output_file = taskForm.scrapyOutputFile
+          }
+          if (taskForm.scrapyOutputFormat) {
+            args.output_format = taskForm.scrapyOutputFormat
+          }
+          if (taskForm.scrapyNoLog) {
+            args.no_log = true
+          }
+        }
+        
         // 解析通知邮箱
         let emails: string[] | null = null
         if (taskForm.notification_emails) {
@@ -592,7 +805,12 @@ const handleSaveTask = async () => {
             max_retries: taskForm.max_retries,
             notify_on_failure: taskForm.notify_on_failure,
             notify_on_success: taskForm.notify_on_success,
-            notification_emails: emails || undefined
+            notification_emails: emails || undefined,
+            // 节点绑定相关字段
+            distribution_mode: taskForm.distribution_mode,
+            target_node_id: taskForm.target_node_id,
+            target_node_ids: taskForm.target_node_ids.length > 0 ? taskForm.target_node_ids : undefined,
+            target_node_tags: taskForm.target_node_tags || undefined
           }
           
           result = await taskStore.createNewTask(taskData)
@@ -610,7 +828,12 @@ const handleSaveTask = async () => {
             notify_on_failure: taskForm.notify_on_failure,
             notify_on_success: taskForm.notify_on_success,
             notification_emails: emails || null,
-            dependency_task_ids: taskForm.dependency_task_ids
+            dependency_task_ids: taskForm.dependency_task_ids,
+            // 节点绑定相关字段
+            distribution_mode: taskForm.distribution_mode,
+            target_node_id: taskForm.target_node_id,
+            target_node_ids: taskForm.target_node_ids.length > 0 ? taskForm.target_node_ids : null,
+            target_node_tags: taskForm.target_node_tags || null
           }
           
           result = await taskStore.updateExistingTask(taskForm.id, taskData)
@@ -648,6 +871,22 @@ const resetForm = () => {
   taskForm.notify_on_success = false
   taskForm.notification_emails = ''
   taskForm.dependency_task_ids = []
+  // 执行器类型
+  taskForm.executorType = 'generic'
+  // Crawlo相关字段
+  taskForm.crawloSpiderName = 'all'
+  taskForm.crawloJsonOutput = false
+  taskForm.crawloNoStats = false
+  // Scrapy相关字段
+  taskForm.scrapySpiderName = ''
+  taskForm.scrapyOutputFile = ''
+  taskForm.scrapyOutputFormat = ''
+  taskForm.scrapyNoLog = false
+  // 节点绑定相关字段
+  taskForm.distribution_mode = 'ANY'
+  taskForm.target_node_id = undefined
+  taskForm.target_node_ids = []
+  taskForm.target_node_tags = ''
   
   if (taskFormRef.value) {
     taskFormRef.value.resetFields()
@@ -677,6 +916,9 @@ const applyCronExpression = () => {
 onMounted(async () => {
   // 获取项目列表
   await projectStore.fetchProjects()
+  
+  // 获取节点列表
+  await nodeStore.fetchNodes()
   
   // 获取任务列表
   await taskStore.fetchTasks({

@@ -31,9 +31,46 @@ class CRUDGitCredential(CRUDBase[GitCredential, GitCredentialCreate, GitCredenti
         """创建新的 Git 凭证，自动关联所有者 ID"""
         obj_in_data = obj_in.model_dump(exclude_unset=True)
         obj_in_data["user_id"] = owner_id
+        
+        # 处理 token 和 SSH 密钥
+        token = obj_in_data.pop("token", None)
+        ssh_private_key = obj_in_data.pop("ssh_private_key", None)
+        
         db_obj = self.model(**obj_in_data)
+        
+        # 设置 token 和 SSH 密钥（通过属性设置器自动加密）
+        if token is not None:
+            db_obj.token = token
+        if ssh_private_key is not None:
+            db_obj.ssh_private_key = ssh_private_key
+            
         db.add(db_obj)
         db.flush()
+        db.commit()
+        db.refresh(db_obj)
+        return db_obj
+
+    def update(
+        self, db: Session, *, db_obj: GitCredential, obj_in: GitCredentialUpdate
+    ) -> GitCredential:
+        """更新 Git 凭证"""
+        obj_data = obj_in.model_dump(exclude_unset=True)
+        
+        # 处理 token 和 SSH 密钥
+        token = obj_data.pop("token", None)
+        ssh_private_key = obj_data.pop("ssh_private_key", None)
+        
+        # 更新其他字段
+        for field in obj_data:
+            setattr(db_obj, field, obj_data[field])
+            
+        # 更新 token 和 SSH 密钥（通过属性设置器自动加密）
+        if token is not None:
+            db_obj.token = token
+        if ssh_private_key is not None:
+            db_obj.ssh_private_key = ssh_private_key
+            
+        db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
         return db_obj

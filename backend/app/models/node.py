@@ -1,9 +1,9 @@
 # /backend/app/models/node.py
 
-from typing import Optional
+from typing import Optional, List
 from enum import Enum as PyEnum
 from sqlalchemy import Integer, String, DateTime, func, Enum as SqlEnum, Float
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base_class import Base
 
 

@@ -19,6 +19,8 @@ export interface ProjectCreate {
   files?: File[]
   git_repo_url?: string
   git_branch?: string
+  ssh_key?: string
+  ssh_key_fingerprint?: string
 }
 
 export interface ProjectUpdate {
@@ -36,16 +38,25 @@ export interface GitCredential {
   provider: string
   username: string
   created_at: string
+  // 新增SSH密钥相关字段
+  has_ssh_key: boolean
+  ssh_key_fingerprint?: string
 }
 
 export interface GitCredentialCreate {
   provider: string
   username: string
   token: string
+  // 新增SSH密钥相关字段
+  ssh_private_key?: string
+  ssh_key_fingerprint?: string
 }
 
 export interface GitCredentialUpdate {
   provider?: string
   username?: string
   token?: string
+  // 新增SSH密钥相关字段
+  ssh_private_key?: string
+  ssh_key_fingerprint?: string
 }

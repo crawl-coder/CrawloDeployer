@@ -1,0 +1,7 @@
+# Worker node specific requirements
+# Add any worker-specific dependencies here
+
+# Crawlo support
+crawlo==1.2.0
+# Scrapy support
+scrapy==2.11.0

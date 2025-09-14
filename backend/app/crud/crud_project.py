@@ -62,13 +62,11 @@ class CRUDProject(CRUDBase[Project, ProjectCreate, ProjectUpdate]):
 
         if 'owner_id' not in obj_in_data:
             raise ValueError("owner_id is required")
-        if 'package_path' not in obj_in_data:
-            raise ValueError("package_path is required")
+        # 不再强制要求 package_path，因为会在后续步骤中设置
 
         db_obj = self.model(**obj_in_data)
         db.add(db_obj)
-        db.flush()
-        db.commit()
+        db.flush()  # 使用flush而不是commit，让调用者控制事务
         db.refresh(db_obj)
         return db_obj
 

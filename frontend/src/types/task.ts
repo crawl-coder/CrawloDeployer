@@ -16,6 +16,12 @@ export interface Task {
   last_run_status: 'PENDING' | 'RUNNING' | 'SUCCESS' | 'FAILURE' | null
   last_run_time: string | null
   dependency_task_ids: number[] | null
+  
+  // 节点绑定相关字段
+  distribution_mode: 'ANY' | 'SPECIFIC' | 'MULTIPLE' | 'TAG_BASED'
+  target_node_id: number | null
+  target_node_ids: number[] | null
+  target_node_tags: string | null
 }
 
 export interface TaskCreate {
@@ -30,6 +36,12 @@ export interface TaskCreate {
   notify_on_failure?: boolean
   notify_on_success?: boolean
   notification_emails?: string[]
+  
+  // 节点绑定相关字段
+  distribution_mode?: 'ANY' | 'SPECIFIC' | 'MULTIPLE' | 'TAG_BASED'
+  target_node_id?: number
+  target_node_ids?: number[]
+  target_node_tags?: string
 }
 
 export interface TaskUpdate {
@@ -46,6 +58,12 @@ export interface TaskUpdate {
   notify_on_success?: boolean
   notification_emails?: string[] | null
   dependency_task_ids?: number[] | null
+  
+  // 节点绑定相关字段
+  distribution_mode?: 'ANY' | 'SPECIFIC' | 'MULTIPLE' | 'TAG_BASED'
+  target_node_id?: number | null
+  target_node_ids?: number[] | null
+  target_node_tags?: string | null
 }
 
 export interface TaskRun {

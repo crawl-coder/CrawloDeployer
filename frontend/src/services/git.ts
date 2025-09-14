@@ -4,13 +4,17 @@ import api from './api'
 export interface GitCredentialCreate {
   provider: string
   username: string
-  token: string
+  token?: string
+  ssh_private_key?: string
+  ssh_key_fingerprint?: string
 }
 
 export interface GitCredentialUpdate {
   provider?: string
   username?: string
   token?: string
+  ssh_private_key?: string
+  ssh_key_fingerprint?: string
 }
 
 export interface GitCredentialOut {
@@ -18,6 +22,8 @@ export interface GitCredentialOut {
   provider: string
   username: string
   created_at: string
+  has_ssh_key: boolean
+  ssh_key_fingerprint?: string
 }
 
 // 获取Git凭证列表

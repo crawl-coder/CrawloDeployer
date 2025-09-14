@@ -31,7 +31,9 @@ export const getUserInfo = async (token?: string): Promise<User> => {
     } 
   } : {};
   
-  const response = await unauthenticatedApi.get<User>('/users/me/', config)
+  // 使用带拦截器的api实例，确保正确的头部设置
+  // 注意：去掉URL末尾的斜杠以避免307重定向
+  const response = await api.get<User>('/users/me', config)
   return response.data
 }
 

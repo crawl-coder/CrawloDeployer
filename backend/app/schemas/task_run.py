@@ -35,7 +35,7 @@ class TaskRunUpdate(TaskRunBase):
 
 class TaskRunOut(TaskRunBase):
     id: int
-    start_time: datetime
+    start_time: Optional[datetime] = None  # 修改为可选
 
     class Config:
         from_attributes = True

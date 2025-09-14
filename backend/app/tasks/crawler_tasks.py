@@ -31,8 +31,44 @@ def _build_command(entrypoint: str, args: dict = None, worker_os: str = "LINUX")
     filename = entrypoint.lower()
     args_list = []
 
+    # 检查是否是Crawlo命令
+    if args and args.get("crawlo_command"):
+        crawlo_args = []
+        # 处理Crawlo特定参数
+        spider_name = args.get("spider_name", "all")
+        crawlo_args.append("run")
+        crawlo_args.append(spider_name)
+        
+        # 处理其他Crawlo选项
+        if args.get("json_output"):
+            crawlo_args.append("--json")
+        if args.get("no_stats"):
+            crawlo_args.append("--no-stats")
+            
+        return ["crawlo"] + crawlo_args
+
+    # 检查是否是Scrapy命令
+    if args and args.get("scrapy_command"):
+        scrapy_args = ["scrapy", "crawl"]
+        # 获取爬虫名称
+        spider_name = args.get("spider_name", "default")
+        scrapy_args.append(spider_name)
+        
+        # 处理其他Scrapy选项
+        if args.get("output_file"):
+            scrapy_args.extend(["-o", args.get("output_file")])
+        if args.get("output_format"):
+            scrapy_args.extend(["-t", args.get("output_format")])
+        if args.get("no_log"):
+            scrapy_args.append("--nolog")
+            
+        return scrapy_args
+
     if args:
         for k, v in args.items():
+            # 跳过Crawlo和Scrapy特定参数
+            if k in ["crawlo_command", "scrapy_command", "spider_name", "json_output", "no_stats", "output_file", "output_format", "no_log"]:
+                continue
             args_list.append(f"--{k}")
             args_list.append(str(v))
 
@@ -68,11 +104,15 @@ def _build_command(entrypoint: str, args: dict = None, worker_os: str = "LINUX")
         raise ValueError(f"Unsupported script type: {entrypoint}")
 
 
-def _read_log_tail(log_file: str, lines: int = 1000) -> str:
-    """读取日志末尾 N 行"""
+def _read_log_tail(log_file: str, lines: int = 100) -> str:
+    """读取日志末尾 N 行，限制总长度"""
     try:
         with open(log_file, "r", encoding="utf-8") as f:
-            return "".join(f.readlines()[-lines:])
+            content = "".join(f.readlines()[-lines:])
+            # 限制总长度为 64KB
+            if len(content) > 65535:
+                content = content[-65535:]
+            return content
     except Exception as e:
         return f"[Log read failed: {str(e)}]"
 
@@ -89,6 +129,11 @@ def _update_task_run_status(
         return
 
     end_time = end_time or datetime.datetime.utcnow()
+    
+    # 限制日志输出长度，避免超出数据库字段限制
+    if log_output and len(log_output) > 65535:
+        log_output = log_output[:65532] + "..."
+    
     update_data = schemas.TaskRunUpdate(
         status=status,
         end_time=end_time,
@@ -119,6 +164,7 @@ def run_generic_script(
             task_run_in = schemas.TaskRunCreate(
                 task_id=original_task_id,
                 celery_task_id=self.request.id,
+                status="PENDING",
                 worker_node=self.request.hostname
             )
             db_task_run = crud.task_run.create(db, obj_in=task_run_in)
@@ -187,7 +233,8 @@ def run_generic_script(
             )
 
             while process.poll() is None:
-                if self.request.called:  # 被 revoke（中断）
+                # 检查任务是否被中断（更兼容的方式）
+                if hasattr(self.request, 'called') and self.request.called:
                     process.terminate()
                     try:
                         process.wait(timeout=5)
@@ -205,7 +252,7 @@ def run_generic_script(
             if return_code == 0:
                 _update_task_run_status(db, db_task_run, TaskRunStatus.SUCCESS, log_content)
                 return {"status": "success", "return_code": 0}
-            elif self.request.called:
+            elif hasattr(self.request, 'called') and self.request.called:
                 _update_task_run_status(
                     db, db_task_run, TaskRunStatus.FAILURE,
                     f"{log_content}\n[INFO] Task was manually stopped."

@@ -3,7 +3,7 @@
 import threading
 import logging
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 import redis
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -14,7 +14,7 @@ from app import crud
 from app.core.config import settings
 from app.db.session import engine  # 使用 engine，非 SessionLocal
 from app.tasks.crawler_tasks import run_generic_script  # ✅ 通用任务
-from app.models.task import Task
+from app.models.task import Task, TaskDistributionMode
 from app.models.node import NodeStatus
 
 logger = logging.getLogger(__name__)
@@ -46,19 +46,74 @@ class SchedulerService:
             args = db_task.args or {}
             env = {"RUN_MODE": "scheduled"}
 
-            # 提交通用任务
-            run_generic_script.delay(
-                original_task_id=db_task.id,
-                project_name=project_name,
-                entrypoint=entrypoint,
-                args=args,
-                env=env
-            )
-            logger.info(f"Scheduled task {task_id} via Celery")
+            # 根据任务分发模式确定目标节点
+            target_nodes = self._get_target_nodes(db, db_task)
+            
+            if not target_nodes:
+                logger.warning(f"No target nodes available for task {task_id}, skipping.")
+                return
+
+            # 如果有多个目标节点，可以分发到多个节点并行执行
+            # 这里简化处理，只分发到第一个可用节点
+            # 在实际实现中，可以根据需求进行更复杂的分发策略
+            for node in target_nodes:
+                # 提交通用任务
+                run_generic_script.delay(
+                    original_task_id=db_task.id,
+                    project_name=project_name,
+                    entrypoint=entrypoint,
+                    args=args,
+                    env=env
+                )
+                logger.info(f"Scheduled task {task_id} via Celery to node {node.hostname}")
+                break  # 只分发到一个节点，如果需要分发到多个节点，可以移除这个break
         except Exception as e:
             logger.error(f"Error in _schedule_job for task {task_id}: {e}")
         finally:
             db.close()
+
+    def _get_target_nodes(self, db: Session, task: Task) -> List:
+        """
+        根据任务的分发模式获取目标节点列表
+        """
+        if task.distribution_mode == TaskDistributionMode.ANY:
+            # 任意节点模式，返回所有在线节点
+            stmt = crud.node.select().where(crud.node.model.status == NodeStatus.ONLINE)
+            result = db.execute(stmt)
+            return list(result.scalars().all())
+        elif task.distribution_mode == TaskDistributionMode.SPECIFIC:
+            # 指定单个节点模式
+            if task.target_node_id:
+                node = crud.node.get(db, id=task.target_node_id)
+                if node and node.status == NodeStatus.ONLINE:
+                    return [node]
+            return []
+        elif task.distribution_mode == TaskDistributionMode.MULTIPLE:
+            # 指定多个节点模式
+            if task.target_node_ids:
+                nodes = []
+                for node_id in task.target_node_ids:
+                    node = crud.node.get(db, id=node_id)
+                    if node and node.status == NodeStatus.ONLINE:
+                        nodes.append(node)
+                return nodes
+            return []
+        elif task.distribution_mode == TaskDistributionMode.TAG_BASED:
+            # 基于标签分发模式
+            if task.target_node_tags:
+                # 这里简化处理，实际实现中可以根据标签进行更复杂的匹配
+                stmt = crud.node.select().where(
+                    crud.node.model.status == NodeStatus.ONLINE,
+                    crud.node.model.tags.contains(task.target_node_tags)
+                )
+                result = db.execute(stmt)
+                return list(result.scalars().all())
+            return []
+        else:
+            # 默认返回所有在线节点
+            stmt = crud.node.select().where(crud.node.model.status == NodeStatus.ONLINE)
+            result = db.execute(stmt)
+            return list(result.scalars().all())
 
     def add_task(self, db_task: Task):
         """将数据库任务添加到调度器"""

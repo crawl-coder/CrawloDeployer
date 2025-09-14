@@ -36,6 +36,7 @@ class Project(ProjectBase):
 
 class ProjectOut(ProjectBase):
     id: int
+    package_path: Optional[str] = None
     created_at: datetime
     owner_id: int
 

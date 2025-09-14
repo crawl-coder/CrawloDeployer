@@ -69,7 +69,7 @@ class CRUDTask(CRUDBase[Task, TaskCreate, TaskUpdate]):
         """创建新任务，校验 project_id 是否存在"""
         # 可选：验证 project_id 是否真实存在
         from app.crud.crud_project import project
-        proj = project.get_by_name(db, id=obj_in.project_id)
+        proj = project.get(db, id=obj_in.project_id)
         if not proj:
             raise ValueError(f"Project with ID {obj_in.project_id} does not exist.")
 
@@ -133,6 +133,18 @@ class CRUDTask(CRUDBase[Task, TaskCreate, TaskUpdate]):
             )
             .offset(skip)
             .limit(limit)
+        )
+        result = db.execute(stmt)
+        return cast(List[Task], result.scalars().all())
+
+    def get_tasks_by_node(self, db: Session, *, node_id: int) -> List[Task]:
+        """获取绑定到指定节点的所有任务"""
+        stmt: Select[tuple[Task]] = select(self.model).where(
+            or_(
+                self.model.target_node_id == node_id,
+                # 这里需要处理target_node_ids字段的查询
+                # 由于JSON字段查询较为复杂，简化处理
+            )
         )
         result = db.execute(stmt)
         return cast(List[Task], result.scalars().all())

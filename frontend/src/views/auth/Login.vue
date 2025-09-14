@@ -105,10 +105,18 @@ const handleLogin = async () => {
     if (valid) {
       loading.value = true
       try {
+        // 添加调试日志
+        console.log('尝试登录:', {
+          username: loginForm.username,
+          password: loginForm.password
+        })
+        
         const result = await authStore.login({
           username: loginForm.username,
           password: loginForm.password
         })
+        
+        console.log('登录结果:', result)
         
         if (result.success) {
           ElMessage.success('登录成功')
@@ -116,7 +124,7 @@ const handleLogin = async () => {
         } else {
           ElMessage.error(result.message || '登录失败')
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('登录失败:', error)
         ElMessage.error('登录失败，请检查用户名和密码')
       } finally {
