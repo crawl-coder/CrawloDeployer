@@ -28,23 +28,23 @@ export interface GitCredentialOut {
 
 // 获取Git凭证列表
 export const getGitCredentials = async (): Promise<GitCredentialOut[]> => {
-  const response = await api.get<GitCredentialOut[]>('/git-credentials/')
+  const response = await api.get<GitCredentialOut[]>('/git-credentials')
   return response.data
 }
 
 // 创建Git凭证
 export const createGitCredential = async (credentialData: GitCredentialCreate): Promise<GitCredentialOut> => {
-  const response = await api.post<GitCredentialOut>('/git-credentials/', credentialData)
+  const response = await api.post<GitCredentialOut>('/git-credentials', credentialData)
   return response.data
 }
 
 // 更新Git凭证
 export const updateGitCredential = async (id: number, credentialData: GitCredentialUpdate): Promise<GitCredentialOut> => {
-  const response = await api.put<GitCredentialOut>(`/git-credentials/${id}/`, credentialData)
+  const response = await api.put<GitCredentialOut>(`/git-credentials/${id}`, credentialData)
   return response.data
 }
 
 // 删除Git凭证
 export const deleteGitCredential = async (id: number): Promise<void> => {
-  await api.delete(`/git-credentials/${id}/`)
+  await api.delete(`/git-credentials/${id}`)
 }

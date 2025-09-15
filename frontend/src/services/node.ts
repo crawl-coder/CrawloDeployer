@@ -7,7 +7,8 @@ export const getNodes = async (params?: {
   skip?: number
   limit?: number
 }): Promise<ApiResponse<Node[]>> => {
-  const response = await api.get<ApiResponse<Node[]>>('/nodes', { params })
+  // 修复API路径，确保使用正确的路径
+  const response = await api.get<ApiResponse<Node[]>>('/nodes/', { params })
   return response.data
 }
 
@@ -19,7 +20,7 @@ export const getNodeById = async (id: number): Promise<ApiResponse<Node>> => {
 
 // 创建节点
 export const createNode = async (nodeData: NodeCreate): Promise<ApiResponse<Node>> => {
-  const response = await api.post<ApiResponse<Node>>('/nodes', nodeData)
+  const response = await api.post<ApiResponse<Node>>('/nodes/', nodeData)
   return response.data
 }
 
@@ -37,6 +38,7 @@ export const deleteNode = async (id: number): Promise<ApiResponse<any>> => {
 
 // 获取物理主机列表
 export const getPhysicalHosts = async (): Promise<ApiResponse<any[]>> => {
+  // 修复API路径，移除末尾的斜杠
   const response = await api.get<ApiResponse<any[]>>('/nodes/physical-hosts')
   return response.data
 }
@@ -48,6 +50,7 @@ export const checkResources = async (data: {
   required_memory_gb?: number
   required_disk_gb?: number
 }): Promise<ApiResponse<any>> => {
+  // 修复API路径，移除末尾的斜杠
   const response = await api.post<ApiResponse<any>>('/nodes/check-resources', data)
   return response.data
 }

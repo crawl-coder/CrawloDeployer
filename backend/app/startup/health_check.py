@@ -10,15 +10,17 @@ from app.startup.dependencies import (
 
 router = APIRouter()
 
+
 @router.get("/", include_in_schema=False)
 def read_root():
     return {"message": "Welcome to CrawloDeployer API", "status": "healthy"}
 
+
 @router.get("/health")
 def health_check(
-    db: Session = Depends(get_db),
-    scheduler_status: dict = Depends(get_scheduler_status),
-    _: None = Depends(verify_healthcheck_token)  # 可选认证
+        db: Session = Depends(get_db),
+        scheduler_status: dict = Depends(get_scheduler_status),
+        _: None = Depends(verify_healthcheck_token)  # 可选认证
 ):
     return {
         "status": "healthy",

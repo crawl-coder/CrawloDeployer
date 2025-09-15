@@ -7,6 +7,7 @@ from loguru import logger
 from celery.signals import worker_process_init, worker_shutdown, heartbeat_sent
 from app.core.config import settings
 
+
 # --- 获取本机信息 ---
 def get_local_ip() -> str:
     """获取本机内网 IP 地址"""
@@ -16,6 +17,7 @@ def get_local_ip() -> str:
             return s.getsockname()[0]
     except Exception:
         return "127.0.0.1"  # 安全兜底
+
 
 # --- 基础信息 ---
 HOSTNAME = socket.gethostname()
@@ -31,7 +33,6 @@ else:
 WORKER_OS_VERSION = platform.release()  # 更稳定的版本号
 PYTHON_VERSION = platform.python_version()
 
-
 # --- Redis 心跳键 ---
 HEARTBEAT_KEY = f"nodes:heartbeat:{HOSTNAME}"
 HEARTBEAT_TTL = getattr(settings, 'NODE_HEARTBEAT_TTL', 60)  # 默认 60 秒
@@ -39,6 +40,7 @@ HEARTBEAT_TTL = getattr(settings, 'NODE_HEARTBEAT_TTL', 60)  # 默认 60 秒
 # --- CrawloDeployer API 注册地址 ---
 # ✅ 修复拼写错误：CRAWL_PRO_API_URL
 REGISTER_URL = f"{settings.CRAWL_PRO_API_URL.rstrip('/')}/api/v1/nodes/heartbeat"
+
 
 # --- 信号处理 ---
 

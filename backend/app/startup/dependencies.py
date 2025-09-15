@@ -5,7 +5,8 @@ from app.db.session import engine
 from app.services.scheduler import scheduler_service
 from fastapi import Depends, HTTPException, status
 from app.core.config import settings
-from typing import Generator, AsyncGenerator, Optional # 添加 AsyncGenerator
+from typing import Generator, AsyncGenerator, Optional  # 添加 AsyncGenerator
+
 
 def get_db() -> Generator[Session, None, None]:
     """
@@ -29,6 +30,7 @@ def verify_healthcheck_token(token: Optional[str] = None):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid healthcheck token"
         )
+
 
 def get_scheduler_status() -> dict:
     """
