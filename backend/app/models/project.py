@@ -34,3 +34,4 @@ class Project(Base):
     # 关系
     owner: Mapped["User"] = relationship("User", back_populates="projects")
     tasks: Mapped[List["Task"]] = relationship("Task", back_populates="project", cascade="all, delete-orphan")
+    workflows: Mapped[List["Workflow"]] = relationship("Workflow", back_populates="project", cascade="all, delete-orphan", primaryjoin="Project.id==Workflow.project_id")

@@ -31,6 +31,10 @@
           <el-icon><Monitor /></el-icon>
           <span>节点管理</span>
         </el-menu-item>
+        <el-menu-item index="/physical-hosts">
+          <el-icon><Monitor /></el-icon>
+          <span>物理主机</span>
+        </el-menu-item>
         <el-menu-item index="/executions">
           <el-icon><Document /></el-icon>
           <span>执行详情</span>

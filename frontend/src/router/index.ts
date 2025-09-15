@@ -15,6 +15,7 @@ const ProjectDetail = () => import('@/views/projects/ProjectDetail.vue')
 const GitCredentialManagement = () => import('@/views/projects/GitCredentialManagement.vue')
 const TaskList = () => import('@/views/tasks/TaskList.vue')
 const NodeList = () => import('@/views/nodes/NodeList.vue')
+const PhysicalHostList = () => import('@/views/nodes/PhysicalHostList.vue')
 const ExecutionList = () => import('@/views/executions/ExecutionList.vue')
 const ExecutionDetail = () => import('@/views/executions/ExecutionDetail.vue')
 const EnvManagement = () => import('@/views/environment/EnvManagement.vue')
@@ -72,6 +73,11 @@ const routes: Array<RouteRecordRaw> = [
         component: NodeList
       },
       {
+        path: 'physical-hosts',
+        name: 'PhysicalHostList',
+        component: PhysicalHostList
+      },
+      {
         path: 'executions',
         name: 'ExecutionList',
         component: ExecutionList
@@ -116,14 +122,10 @@ router.beforeEach(async (to, from, next) => {
   try {
     const authStore = useAuthStore()
     
-    // 初始化认证状态
-    if (!authStore.token) {
-      await authStore.initAuth()
-    }
-    
     // 记录导航信息（用于调试）
     console.log(`导航: 从 ${from.path} 到 ${to.path}`)
     console.log(`认证状态: ${authStore.isAuthenticated ? '已认证' : '未认证'}`)
+    console.log(`目标路由需要认证: ${to.meta.requiresAuth ? '是' : '否'}`)
     
     // 检查是否需要认证
     if (to.meta.requiresAuth && !authStore.isAuthenticated) {

@@ -1,12 +1,12 @@
 // /Users/oscar/projects/CrawlPro/frontend/src/services/env.ts
 
-import request from '@/utils/request'
+import request from '../utils/request'
 import {
   EnvVariable,
   EnvVariableCreate,
   EnvVariableUpdate,
   EnvListResponse
-} from '@/types/env'
+} from '../types/env'
 
 export class EnvService {
   // 获取环境变量列表

@@ -1,5 +1,5 @@
 import api from './api'
-import type { User, UserStats, UserUpdate, PasswordUpdate } from '@/types/auth'
+import type { User, UserStats, UserUpdate, PasswordUpdate } from '../types/auth'
 
 // 获取用户资料
 export const getProfile = async (): Promise<User> => {

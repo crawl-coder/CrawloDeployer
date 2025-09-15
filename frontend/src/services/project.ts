@@ -1,6 +1,6 @@
 import api from './api'
-import type { Project, ProjectCreate, ProjectUpdate } from '@/types/project'
-import type { ApiResponse } from '@/types/api'
+import type { Project, ProjectUpdate } from '../types/project'
+import type { ApiResponse } from '../types/api'
 
 // 获取项目列表
 export const getProjects = async (params?: {

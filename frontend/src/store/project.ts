@@ -8,8 +8,8 @@ import {
   syncProjectToNodes,
   getProjectFiles,
   getProjectStats
-} from '@/services/project'
-import type { Project, ProjectCreate, ProjectUpdate } from '@/types/project'
+} from '../services/project'
+import type { Project, ProjectCreate, ProjectUpdate } from '../types/project'
 import { ElMessage } from 'element-plus'
 
 interface ProjectState {
@@ -42,7 +42,7 @@ export const useProjectStore = defineStore('project', {
           this.projectCount = response.total || this.projects.length
         } else {
           this.error = response.message || '获取项目列表失败'
-          ElMessage.error(this.error)
+          ElMessage.error(this.error || '获取项目列表失败')
         }
       } catch (error) {
         this.error = '网络错误'
@@ -57,7 +57,7 @@ export const useProjectStore = defineStore('project', {
       this.error = null
       try {
         const response = await getProjectById(id)
-        if (response.success) {
+        if (response.success && response.data) {
           const index = this.projects.findIndex(project => project.id === id)
           if (index !== -1) {
             this.projects[index] = response.data
@@ -67,7 +67,7 @@ export const useProjectStore = defineStore('project', {
           return response
         } else {
           this.error = response.message || '获取项目详情失败'
-          ElMessage.error(this.error)
+          ElMessage.error(this.error || '获取项目详情失败')
           return response
         }
       } catch (error) {
@@ -109,7 +109,7 @@ export const useProjectStore = defineStore('project', {
           formData.append('deploy_method', 'upload')
           
           // 添加所有文件
-          projectData.files.forEach((file, index) => {
+          projectData.files.forEach((file) => {
             formData.append('files', file)
           })
         } else {
@@ -121,13 +121,13 @@ export const useProjectStore = defineStore('project', {
         }
         
         const response = await createProject(formData)
-        if (response.success) {
+        if (response.success && response.data) {
           this.projects.push(response.data)
           this.projectCount++
           ElMessage.success('创建成功')
         } else {
           this.error = response.message || '创建失败'
-          ElMessage.error(this.error)
+          ElMessage.error(this.error || '创建失败')
         }
         return response
       } catch (error) {
@@ -144,7 +144,7 @@ export const useProjectStore = defineStore('project', {
       this.error = null
       try {
         const response = await updateProject(id, project)
-        if (response.success) {
+        if (response.success && response.data) {
           const index = this.projects.findIndex(p => p.id === id)
           if (index !== -1) {
             this.projects[index] = response.data
@@ -152,7 +152,7 @@ export const useProjectStore = defineStore('project', {
           ElMessage.success('更新成功')
         } else {
           this.error = response.message || '更新失败'
-          ElMessage.error(this.error)
+          ElMessage.error(this.error || '更新失败')
         }
         return response
       } catch (error) {
@@ -175,7 +175,7 @@ export const useProjectStore = defineStore('project', {
           ElMessage.success('删除成功')
         } else {
           this.error = response.message || '删除失败'
-          ElMessage.error(this.error)
+          ElMessage.error(this.error || '删除失败')
         }
         return response
       } catch (error) {
@@ -196,7 +196,7 @@ export const useProjectStore = defineStore('project', {
           ElMessage.success('项目同步成功')
         } else {
           this.error = response.message || '项目同步失败'
-          ElMessage.error(this.error)
+          ElMessage.error(this.error || '项目同步失败')
         }
         return response
       } catch (error) {
@@ -215,7 +215,7 @@ export const useProjectStore = defineStore('project', {
         const response = await getProjectFiles(id)
         if (!response.success) {
           this.error = response.message || '获取项目文件失败'
-          ElMessage.error(this.error)
+          ElMessage.error(this.error || '获取项目文件失败')
         }
         return response
       } catch (error) {
@@ -234,7 +234,7 @@ export const useProjectStore = defineStore('project', {
         const response = await getProjectStats(id)
         if (!response.success) {
           this.error = response.message || '获取项目统计失败'
-          ElMessage.error(this.error)
+          ElMessage.error(this.error || '获取项目统计失败')
         }
         return response
       } catch (error) {

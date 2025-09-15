@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { login as loginApi, register as registerApi, getUserInfo } from '@/services/auth'
-import type { LoginRequest, RegisterRequest, User } from '@/types/auth'
+import { login as loginApi, register as registerApi, getUserInfo } from '../services/auth'
+import type { LoginRequest, RegisterRequest, User } from '../types/auth'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
@@ -16,7 +16,9 @@ export const useAuthStore = defineStore('auth', () => {
       const response = await loginApi(credentials)
       console.log('登录响应:', response)
       token.value = response.access_token
+      console.log('设置token到store:', token.value)
       localStorage.setItem('token', response.access_token)
+      console.log('设置token到localStorage:', response.access_token)
       
       // 获取用户信息 - 直接传递token以避免localStorage同步问题
       console.log('获取用户信息...')
@@ -70,7 +72,15 @@ export const useAuthStore = defineStore('auth', () => {
     console.log('初始化认证状态，本地token:', savedToken)
     if (savedToken) {
       token.value = savedToken
-      await fetchUserInfo(savedToken)
+      console.log('设置store中的token:', savedToken)
+      try {
+        await fetchUserInfo(savedToken)
+      } catch (error) {
+        console.error('初始化用户信息失败:', error)
+        // 如果获取用户信息失败，清除token
+        token.value = null
+        localStorage.removeItem('token')
+      }
     }
   }
   

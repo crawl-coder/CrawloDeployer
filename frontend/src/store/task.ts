@@ -13,8 +13,8 @@ import {
   addTaskDependencies,
   getTaskDependencies,
   clearTaskDependencies
-} from '@/services/task'
-import type { Task, TaskCreate, TaskUpdate } from '@/types/task'
+} from '../services/task'
+import type { Task, TaskCreate, TaskUpdate } from '../types/task'
 
 export const useTaskStore = defineStore('task', () => {
   // 状态
@@ -31,8 +31,12 @@ export const useTaskStore = defineStore('task', () => {
     loading.value = true
     error.value = null
     try {
-      const data = await getTasks(params)
-      tasks.value = data
+      const response = await getTasks(params)
+      if (response.success) {
+        tasks.value = response.data || []
+      } else {
+        error.value = response.message || '获取任务列表失败'
+      }
     } catch (err: any) {
       error.value = err.message || '获取任务列表失败'
     } finally {
@@ -45,9 +49,14 @@ export const useTaskStore = defineStore('task', () => {
     loading.value = true
     error.value = null
     try {
-      const data = await getTask(id)
-      currentTask.value = data
-      return data
+      const response = await getTask(id)
+      if (response.success) {
+        currentTask.value = response.data || null
+        return response.data
+      } else {
+        error.value = response.message || '获取任务详情失败'
+        return null
+      }
     } catch (err: any) {
       error.value = err.message || '获取任务详情失败'
       return null
@@ -61,9 +70,14 @@ export const useTaskStore = defineStore('task', () => {
     loading.value = true
     error.value = null
     try {
-      const data = await createTask(taskData)
-      tasks.value.push(data)
-      return { success: true, data }
+      const response = await createTask(taskData)
+      if (response.success && response.data) {
+        tasks.value.push(response.data)
+        return { success: true, data: response.data }
+      } else {
+        error.value = response.message || '创建任务失败'
+        return { success: false, message: error.value }
+      }
     } catch (err: any) {
       error.value = err.message || '创建任务失败'
       return { success: false, message: error.value }
@@ -77,15 +91,20 @@ export const useTaskStore = defineStore('task', () => {
     loading.value = true
     error.value = null
     try {
-      const data = await updateTask(id, taskData)
-      const index = tasks.value.findIndex(t => t.id === id)
-      if (index !== -1) {
-        tasks.value[index] = data
+      const response = await updateTask(id, taskData)
+      if (response.success && response.data) {
+        const index = tasks.value.findIndex(t => t.id === id)
+        if (index !== -1) {
+          tasks.value[index] = response.data
+        }
+        if (currentTask.value && currentTask.value.id === id) {
+          currentTask.value = response.data
+        }
+        return { success: true, data: response.data }
+      } else {
+        error.value = response.message || '更新任务失败'
+        return { success: false, message: error.value }
       }
-      if (currentTask.value && currentTask.value.id === id) {
-        currentTask.value = data
-      }
-      return { success: true, data }
     } catch (err: any) {
       error.value = err.message || '更新任务失败'
       return { success: false, message: error.value }
@@ -99,12 +118,17 @@ export const useTaskStore = defineStore('task', () => {
     loading.value = true
     error.value = null
     try {
-      await deleteTask(id)
-      tasks.value = tasks.value.filter(t => t.id !== id)
-      if (currentTask.value && currentTask.value.id === id) {
-        currentTask.value = null
+      const response = await deleteTask(id)
+      if (response.success) {
+        tasks.value = tasks.value.filter(t => t.id !== id)
+        if (currentTask.value && currentTask.value.id === id) {
+          currentTask.value = null
+        }
+        return { success: true }
+      } else {
+        error.value = response.message || '删除任务失败'
+        return { success: false, message: error.value }
       }
-      return { success: true }
     } catch (err: any) {
       error.value = err.message || '删除任务失败'
       return { success: false, message: error.value }
@@ -118,15 +142,20 @@ export const useTaskStore = defineStore('task', () => {
     loading.value = true
     error.value = null
     try {
-      const data = await toggleTask(id, enable)
-      const index = tasks.value.findIndex(t => t.id === id)
-      if (index !== -1) {
-        tasks.value[index] = data
+      const response = await toggleTask(id, enable)
+      if (response.success && response.data) {
+        const index = tasks.value.findIndex(t => t.id === id)
+        if (index !== -1) {
+          tasks.value[index] = response.data
+        }
+        if (currentTask.value && currentTask.value.id === id) {
+          currentTask.value = response.data
+        }
+        return { success: true, data: response.data }
+      } else {
+        error.value = response.message || '切换任务状态失败'
+        return { success: false, message: error.value }
       }
-      if (currentTask.value && currentTask.value.id === id) {
-        currentTask.value = data
-      }
-      return { success: true, data }
     } catch (err: any) {
       error.value = err.message || '切换任务状态失败'
       return { success: false, message: error.value }
@@ -140,8 +169,13 @@ export const useTaskStore = defineStore('task', () => {
     loading.value = true
     error.value = null
     try {
-      const data = await runTask(id)
-      return { success: true, data }
+      const response = await runTask(id)
+      if (response.success) {
+        return { success: true, data: response.data }
+      } else {
+        error.value = response.message || '执行任务失败'
+        return { success: false, message: error.value }
+      }
     } catch (err: any) {
       error.value = err.message || '执行任务失败'
       return { success: false, message: error.value }
@@ -155,8 +189,13 @@ export const useTaskStore = defineStore('task', () => {
     loading.value = true
     error.value = null
     try {
-      const data = await getTaskStats(id)
-      return { success: true, data }
+      const response = await getTaskStats(id)
+      if (response.success) {
+        return { success: true, data: response.data }
+      } else {
+        error.value = response.message || '获取任务统计失败'
+        return { success: false, message: error.value }
+      }
     } catch (err: any) {
       error.value = err.message || '获取任务统计失败'
       return { success: false, message: error.value }
@@ -170,8 +209,13 @@ export const useTaskStore = defineStore('task', () => {
     loading.value = true
     error.value = null
     try {
-      const data = await getTasksOverviewStats()
-      return { success: true, data }
+      const response = await getTasksOverviewStats()
+      if (response.success) {
+        return { success: true, data: response.data }
+      } else {
+        error.value = response.message || '获取任务概览统计失败'
+        return { success: false, message: error.value }
+      }
     } catch (err: any) {
       error.value = err.message || '获取任务概览统计失败'
       return { success: false, message: error.value }
@@ -185,15 +229,20 @@ export const useTaskStore = defineStore('task', () => {
     loading.value = true
     error.value = null
     try {
-      const data = await addTaskDependencies(id, dependencyIds)
-      const index = tasks.value.findIndex(t => t.id === id)
-      if (index !== -1) {
-        tasks.value[index] = data
+      const response = await addTaskDependencies(id, dependencyIds)
+      if (response.success && response.data) {
+        const index = tasks.value.findIndex(t => t.id === id)
+        if (index !== -1) {
+          tasks.value[index] = response.data
+        }
+        if (currentTask.value && currentTask.value.id === id) {
+          currentTask.value = response.data
+        }
+        return { success: true, data: response.data }
+      } else {
+        error.value = response.message || '添加任务依赖失败'
+        return { success: false, message: error.value }
       }
-      if (currentTask.value && currentTask.value.id === id) {
-        currentTask.value = data
-      }
-      return { success: true, data }
     } catch (err: any) {
       error.value = err.message || '添加任务依赖失败'
       return { success: false, message: error.value }
@@ -207,8 +256,13 @@ export const useTaskStore = defineStore('task', () => {
     loading.value = true
     error.value = null
     try {
-      const data = await getTaskDependencies(id)
-      return { success: true, data }
+      const response = await getTaskDependencies(id)
+      if (response.success) {
+        return { success: true, data: response.data }
+      } else {
+        error.value = response.message || '获取任务依赖失败'
+        return { success: false, message: error.value }
+      }
     } catch (err: any) {
       error.value = err.message || '获取任务依赖失败'
       return { success: false, message: error.value }
@@ -222,15 +276,20 @@ export const useTaskStore = defineStore('task', () => {
     loading.value = true
     error.value = null
     try {
-      const data = await clearTaskDependencies(id)
-      const index = tasks.value.findIndex(t => t.id === id)
-      if (index !== -1) {
-        tasks.value[index] = data
+      const response = await clearTaskDependencies(id)
+      if (response.success && response.data) {
+        const index = tasks.value.findIndex(t => t.id === id)
+        if (index !== -1) {
+          tasks.value[index] = response.data
+        }
+        if (currentTask.value && currentTask.value.id === id) {
+          currentTask.value = response.data
+        }
+        return { success: true, data: response.data }
+      } else {
+        error.value = response.message || '清除任务依赖失败'
+        return { success: false, message: error.value }
       }
-      if (currentTask.value && currentTask.value.id === id) {
-        currentTask.value = data
-      }
-      return { success: true, data }
     } catch (err: any) {
       error.value = err.message || '清除任务依赖失败'
       return { success: false, message: error.value }

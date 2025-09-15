@@ -86,3 +86,5 @@ class Task(Base):
     # 自引用关系
     parent_task: Mapped["Task"] = relationship("Task", remote_side=[id], back_populates="child_tasks")
     child_tasks: Mapped[List["Task"]] = relationship("Task", back_populates="parent_task")
+    # 工作流关系
+    workflow_tasks: Mapped[List["WorkflowTask"]] = relationship("WorkflowTask", back_populates="task", cascade="all, delete-orphan", primaryjoin="Task.id==WorkflowTask.task_id")

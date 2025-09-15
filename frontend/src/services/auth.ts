@@ -1,9 +1,9 @@
-import api, { unauthenticatedApi } from './api'
-import type { LoginRequest, RegisterRequest, TokenResponse, User } from '@/types/auth'
+import api from './api'
+import type { LoginRequest, RegisterRequest, TokenResponse, User } from '../types/auth'
 
 // 登录
 export const login = async (credentials: LoginRequest): Promise<TokenResponse> => {
-  const response = await api.post<TokenResponse>('/auth/login/', 
+  const response = await api.post<TokenResponse>('/auth/login', 
     new URLSearchParams({
       username: credentials.username,
       password: credentials.password
@@ -19,7 +19,7 @@ export const login = async (credentials: LoginRequest): Promise<TokenResponse> =
 
 // 注册
 export const register = async (userData: RegisterRequest): Promise<void> => {
-  await api.post('/users/', userData)
+  await api.post('/users', userData)
 }
 
 // 获取用户信息
@@ -39,7 +39,7 @@ export const getUserInfo = async (token?: string): Promise<User> => {
 
 // 更新用户信息
 export const updateUserInfo = async (userData: Partial<User>): Promise<User> => {
-  const response = await api.put<User>('/users/me/', userData)
+  const response = await api.put<User>('/users/me', userData)
   return response.data
 }
 
@@ -48,5 +48,5 @@ export const updatePassword = async (passwordData: {
   current_password: string
   new_password: string
 }): Promise<void> => {
-  await api.put('/users/me/password/', passwordData)
+  await api.put('/users/me/password', passwordData)
 }

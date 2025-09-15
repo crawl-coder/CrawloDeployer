@@ -2,7 +2,7 @@
 
 from typing import Optional, List
 from enum import Enum as PyEnum
-from sqlalchemy import Integer, String, DateTime, func, Enum as SqlEnum, Float
+from sqlalchemy import Integer, String, DateTime, func, Enum as SqlEnum, Float, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base_class import Base
 
@@ -60,7 +60,7 @@ class Node(Base):
     # ✅ 标签与能力
     tags: Mapped[Optional[str]] = mapped_column(String(100), comment="节点标签，如 gpu,proxy,chrome")
     capabilities: Mapped[Optional[str]] = mapped_column(
-        String(200),
+        Text,
         comment="节点能力（JSON 格式），如 {'gpu': true, 'browser': 'chrome'}"
     )  # 后续可改为 JSON 类型
 
@@ -71,3 +71,9 @@ class Node(Base):
     # ✅ 网络信息（可选）
     public_ip: Mapped[Optional[str]] = mapped_column(String(50), comment="公网 IP")
     agent_port: Mapped[Optional[int]] = mapped_column(Integer, comment="Worker 通信端口")
+    
+    # ✅ 物理主机信息（用于支持同一物理机上的多个逻辑节点）
+    physical_host_id: Mapped[Optional[str]] = mapped_column(String(100), comment="物理主机标识（如MAC地址）")
+    physical_host_name: Mapped[Optional[str]] = mapped_column(String(100), comment="物理主机名")
+    container_id: Mapped[Optional[str]] = mapped_column(String(100), comment="容器ID（如果是Docker容器）")
+    instance_name: Mapped[Optional[str]] = mapped_column(String(100), comment="实例名称（用户自定义）")

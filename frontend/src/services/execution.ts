@@ -1,12 +1,12 @@
-// /Users/oscar/projects/CrawlPro/frontend/src/services/execution.ts
+// /Users/oscar/projects/CrawloDeployer/frontend/src/services/execution.ts
 
-import request from '@/utils/request'
+import request from '../utils/request'
 import {
   ExecutionDetail,
   ExecutionResult,
   ExecutionMetrics,
   ExecutionListResponse
-} from '@/types/execution'
+} from '../types/execution'
 
 export class ExecutionService {
   // 获取执行记录列表
@@ -20,14 +20,26 @@ export class ExecutionService {
     sortBy?: string
     sortOrder?: string
   }) {
+    // 转换参数以匹配后端API
+    const backendParams: any = {
+      skip: (params.page - 1) * params.size,
+      limit: params.size
+    };
+    
+    // 添加其他过滤参数
+    if (params.taskName) backendParams.task_name = params.taskName;
+    if (params.status) backendParams.status = params.status;
+    if (params.startDate) backendParams.start_date = params.startDate;
+    if (params.endDate) backendParams.end_date = params.endDate;
+    
     return request<{
       data: ExecutionListResponse
       message: string
       success: boolean
     }>({
-      url: '/executions',
+      url: '/task-runs',
       method: 'GET',
-      params
+      params: backendParams
     })
   }
 
@@ -38,7 +50,7 @@ export class ExecutionService {
       message: string
       success: boolean
     }>({
-      url: `/executions/${id}`,
+      url: `/task-runs/${id}`,
       method: 'GET'
     })
   }
@@ -50,7 +62,7 @@ export class ExecutionService {
       message: string
       success: boolean
     }>({
-      url: `/executions/${id}/logs`,
+      url: `/task-runs/${id}/log`,
       method: 'GET'
     })
   }
@@ -64,6 +76,7 @@ export class ExecutionService {
       keyword?: string
     }
   ) {
+    // 注意：后端可能没有直接对应的结果获取API，这里暂时保持原样
     return request<{
       data: {
         items: ExecutionResult[]
@@ -74,7 +87,7 @@ export class ExecutionService {
       message: string
       success: boolean
     }>({
-      url: `/executions/${executionId}/results`,
+      url: `/task-runs/${executionId}/results`,
       method: 'GET',
       params
     })
@@ -82,13 +95,15 @@ export class ExecutionService {
 
   // 获取执行性能统计
   static async getMetrics(executionId: number | string) {
+    // 注意：后端可能没有直接对应的性能统计API，这里暂时保持原样
     return request<{
       data: ExecutionMetrics
       message: string
       success: boolean
     }>({
-      url: `/executions/${executionId}/metrics`,
+      url: `/task-runs/${executionId}/metrics`,
       method: 'GET'
+      // 后端可能没有这个端点，需要根据实际情况调整
     })
   }
 
@@ -99,8 +114,8 @@ export class ExecutionService {
       message: string
       success: boolean
     }>({
-      url: `/executions/${executionId}/export`,
-      method: 'POST'
+      url: `/task-runs/${executionId}/export`,
+      method: 'GET'
     })
   }
 }

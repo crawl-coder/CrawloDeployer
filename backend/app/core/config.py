@@ -26,11 +26,21 @@ class Settings(BaseSettings):
             "http://localhost:8080",
             "http://localhost:5173",
             "http://localhost:5178",
+            "http://localhost:5179",  # 添加这一行
             "http://localhost:5181",  # 添加这一行
+            "http://localhost:5183",  # 添加这一行
+            "http://localhost:5184",  # 添加这一行
+            "http://localhost:5185",  # 添加这一行
+            "http://localhost:5186",  # 添加这一行
             "http://127.0.0.1:8080",
             "http://127.0.0.1:5173",
             "http://127.0.0.1:5178",
+            "http://127.0.0.1:5179",  # 添加这一行
             "http://127.0.0.1:5181",  # 添加这一行
+            "http://127.0.0.1:5183",  # 添加这一行
+            "http://127.0.0.1:5184",  # 添加这一行
+            "http://127.0.0.1:5185",  # 添加这一行
+            "http://127.0.0.1:5186",  # 添加这一行
         ],
         description="允许的前端源（CORS）"
     )

@@ -5,8 +5,8 @@ import {
   createGitCredential,
   updateGitCredential,
   deleteGitCredential
-} from '@/services/git'
-import type { GitCredential, GitCredentialCreate, GitCredentialUpdate } from '@/types/project'
+} from '../services/git'
+import type { GitCredential, GitCredentialCreate, GitCredentialUpdate } from '../types/project'
 
 export const useGitStore = defineStore('git', () => {
   // 状态

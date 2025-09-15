@@ -1,14 +1,14 @@
 // /Users/oscar/projects/CrawlPro/frontend/src/services/workflow.ts
 
-import request from '@/utils/request'
+import request from '../utils/request'
 import {
   Workflow,
   WorkflowCreate,
   WorkflowUpdate,
   WorkflowDesign,
   WorkflowListResponse
-} from '@/types/workflow'
-import { Task } from '@/types/task'
+} from '../types/workflow'
+import { Task } from '../types/task'
 
 export class WorkflowService {
   // 获取工作流列表
